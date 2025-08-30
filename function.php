@@ -22,17 +22,21 @@ class CCC_My_Favorite {
     add_action( 'wp_enqueue_scripts', array( $this, 'training_scripts' ) );
     add_action( 'wp_ajax_ccc_my_favorite-update-action', array( $this, 'usermeta_my_favorite_update') );
     add_action( 'wp_ajax_ccc_my_favorite-get-action', array( $this, 'usermeta_my_favorite_get') );
-    add_action( 'wp_ajax_ccc_my_training-save-action', array( $this, 'save_training_session') );
-    add_action( 'wp_ajax_ccc_my_training-get-action', array( $this, 'get_training_sessions') );
-    add_action( 'wp_ajax_ccc_my_training-delete-action', array( $this, 'delete_training_session') );
-    add_action( 'wp_ajax_ccc_add_drill_to_training', array( $this, 'add_drill_to_training') );
-    add_action( 'wp_ajax_ccc_get_drill_trainings', array( $this, 'get_drill_trainings') );
-    add_action( 'wp_ajax_ccc_remove_drill_from_training', array( $this, 'remove_drill_from_training') );\n    add_action( 'wp_ajax_get_posts_by_ids', array( $this, 'get_posts_by_ids') );\n    add_action( 'wp_ajax_nopriv_get_posts_by_ids', array( $this, 'get_posts_by_ids') );
 
     add_action( 'wp_enqueue_scripts', array( $this, 'list_styles' ) );
     add_action( 'wp_enqueue_scripts', array( $this, 'list_scripts' ) );
     add_action( 'wp_ajax_ccc_my_favorite-list-action', array( $this, 'list_posts_action' ) );
     add_action( 'wp_ajax_nopriv_ccc_my_favorite-list-action', array( $this, 'list_posts_action' ) );
+    
+    // Training AJAX actions
+    add_action( 'wp_ajax_ccc_my_training-save-action', array( $this, 'save_training_session') );
+    add_action( 'wp_ajax_ccc_my_training-get-action', array( $this, 'get_training_sessions') );
+    add_action( 'wp_ajax_ccc_my_training-delete-action', array( $this, 'delete_training_session') );
+    add_action( 'wp_ajax_ccc_add_drill_to_training', array( $this, 'add_drill_to_training') );
+    add_action( 'wp_ajax_ccc_get_drill_trainings', array( $this, 'get_drill_trainings') );
+    add_action( 'wp_ajax_ccc_remove_drill_from_training', array( $this, 'remove_drill_from_training') );
+    add_action( 'wp_ajax_get_posts_by_ids', array( $this, 'get_posts_by_ids') );
+    add_action( 'wp_ajax_nopriv_get_posts_by_ids', array( $this, 'get_posts_by_ids') );
   } //endfunction
 
   public function jquery_check() {
@@ -244,7 +248,7 @@ class CCC_My_Favorite {
     die();
   }
   
-  /*** Trainingsessie verwijderen ***/
+  /*** Delete training session ***/
   public function delete_training_session() {
     if( check_ajax_referer( $_POST['action'], 'nonce', false ) ) {
       $user_id = wp_get_current_user()->ID;
@@ -257,6 +261,18 @@ class CCC_My_Favorite {
         });
         
         update_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, array_values($sessions) );
+        
+        // Mark all drills from this training as unassigned
+        $drills = get_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, true );
+        if( is_array($drills) ) {
+          foreach($drills as &$drill) {
+            if($drill['training_id'] === $session_id) {
+              $drill['training_id'] = 'none';
+            }
+          }
+          update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, $drills );
+        }
+        
         wp_send_json_success();
       } else {
         wp_send_json_error( 'No sessions found' );
@@ -367,12 +383,12 @@ class CCC_My_Favorite {
       if( is_array($drills) ) {
         foreach($drills as $key => &$drill) {
           if($drill['post_id'] == $post_id && $drill['training_id'] == $training_id) {
-            unset($drills[$key]);
+            $drill['training_id'] = 'none'; // Mark as unassigned instead of deleting
             break;
           }
         }
         
-        update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, array_values($drills) );
+        update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, $drills );
       }
       
       wp_send_json_success();
@@ -384,19 +400,30 @@ class CCC_My_Favorite {
   
   /*** Get posts by IDs for gallery display ***/
   public function get_posts_by_ids() {
+    if( !isset($_POST['post_ids']) ) {
+      wp_send_json_error( 'No post IDs provided' );
+      die();
+    }
+    
     $post_ids = explode(',', sanitize_text_field($_POST['post_ids']));
     $post_ids = array_map('intval', $post_ids);
+    $post_ids = array_filter($post_ids); // Remove empty values
     
     $posts = array();
     foreach($post_ids as $post_id) {
       $post = get_post($post_id);
       if($post) {
+        $thumbnail_url = get_the_post_thumbnail_url($post->ID, 'medium');
+        if(!$thumbnail_url) {
+          $thumbnail_url = 'https://via.placeholder.com/300x200?text=No+Image';
+        }
+        
         $posts[] = array(
           'id' => $post->ID,
           'title' => $post->post_title,
-          'excerpt' => wp_trim_words($post->post_excerpt, 20),
+          'excerpt' => wp_trim_words($post->post_excerpt ?: $post->post_content, 20),
           'permalink' => get_permalink($post->ID),
-          'thumbnail' => get_the_post_thumbnail_url($post->ID, 'medium') ?: 'https://via.placeholder.com/300x200'
+          'thumbnail' => $thumbnail_url
         );
       }
     }
