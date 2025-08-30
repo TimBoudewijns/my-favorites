@@ -1,96 +1,137 @@
-# My Favorites
+# Hockey Training Favorites Plugin
 
-This is the development repository for My Favorites, a WordPress plugin that saves user's favorite posts and lists them. You can also download the plugin package installation from the [WordPress.org Plugin Directory](https://wordpress.org/plugins/my-favorites/).
+This enhanced version of the My Favorites plugin has been specifically developed for hockey coaches to create and manage training sessions.
 
-Contributors: takashimatsuyama  
-Donate link:  
-Tags: favorites, likes, accessibility, favorite posts  
-Requires at least: 4.8  
-Tested up to: 6.6  
-Requires PHP: 5.4.0  
-Stable tag: 1.4.3  
-License: GPLv2 or later  
-License URI: http://www.gnu.org/licenses/gpl-2.0.html  
+## New Features
 
-Save user's favorite posts and list them.
+### 1. Save Training Sessions
+Coaches can now save their selected favorite drills as a complete training session with:
+- A name for the training session
+- A date or week number
+- All selected drills
 
-## Description
+### 2. Group Training Sessions
+Training sessions are automatically grouped by:
+- Week number
+- Date
+This makes it easy to find training sessions for specific periods.
 
-Save user's favorite posts and list them.
-This plugin is simple. You can save the user's favorite posts just a install and display them anywhere you want with just a shortcode.
-The logged-in user's data is saved in the user meta. Other user's data is saved to Web Storage (localStorage).
+### 3. Search and Filter
+- **Search function**: Search training sessions by name
+- **Filter options**: Filter by week, month, or custom period
+
+### 4. Modern Styling
+The plugin now uses modern CSS styling based on the Field Hockey Platform design with:
+- Modern card-based layouts
+- Responsive design for all devices
+- Professional colors (orange #F77F00 and blue #4169E1)
+
+## Shortcodes
+
+### Existing shortcodes (remain functional):
+```
+[ccc_my_favorite_select_button] - Favorite button for a drill
+[ccc_my_favorite_list_menu] - Menu showing number of favorites
+[ccc_my_favorite_list_results] - List of favorite drills
+```
+
+### New shortcodes:
+```
+[ccc_my_training_save_button] - Button to save current selection as training session
+[ccc_my_training_sessions_list] - Overview of all saved training sessions
+```
 
 ## Usage
 
-* **Shortcode:** `[ccc_my_favorite_select_button post_id="" style=""]`
-* **Shortcode:** `[ccc_my_favorite_list_menu slug="" text="" style=""]`
-* **Shortcode:** `[ccc_my_favorite_list_results class="" style=""]`
+### For coaches:
 
-For pages with a shortcode for list view ([ccc_my_favorite_list_results]).
+1. **Select drills**: 
+   - Browse through the drills on the website
+   - Click "Favorite" for each drill you want to add
 
-"Load More" is displayed with "posts_per_page".
-It will be displayed when the user has more favorite posts than "posts_per_page".
+2. **Save training session**:
+   - Go to the favorites overview
+   - Click "Save Training Session"
+   - Give the training session a name
+   - Select a date or week number
+   - Click "Save"
 
-* **Shortcode:** `[ccc_my_favorite_list_results posts_per_page="10"]` default is 100 posts.
-
-You can display the post's "excerpt".
-This value is the char length.
-If not needed, use "no excerpt" or "0".
-
-* **Shortcode:** `[ccc_my_favorite_list_results excerpt="30"]`
-
-If you want, you can change the code for list view yourself.
-
-* **Shortcode:** `[ccc_my_favorite_list_custom_template style=""]`
-
-For pages with a shortcode for custom list view ([ccc_my_favorite_list_custom_template]).
-Add the function (`function ccc_my_favorite_list_custom_template( $my_favorite_post_id ) { }`) for your list view to `your-theme/functions.php`.
-`$my_favorite_post_id` is array.
-`style="none"` excludes the default CSS for the list.
-
-Detailed usage is under preparation.
+3. **Load training session**:
+   - Go to "My Training Sessions"
+   - Find the desired session (use search/filter if needed)
+   - Click "Load training" to load all drills from that session
 
 ## Installation
 
-1. Upload `my-favorites` to the `/wp-content/plugins/` directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Use shortcodes to display the favorite posts list and an icon for save and a menu for link to list.
+1. Upload the plugin folder to `/wp-content/plugins/`
+2. Activate the plugin via the WordPress admin panel
+3. Add the shortcodes to the desired pages
 
-## Changelog
+## CSS Customization
 
-### 1.4.3
-Add escapes to attributes to prevent XSS attacks
+If you want to customize the styling, use the following CSS classes:
 
-### 1.4.2
-Merge pull request [#4](https://github.com/takashi-matsuyama/my-favorites/pull/4) from [tblobaum](https://github.com/tblobaum)/patch-1  
-> Fixes problems with logged in users as explained here: [WordPress.org Forums](https://wordpress.org/support/topic/plugin-not-working-correctly-for-logged-in-user/)
+### New CSS classes (to avoid conflicts):
+- `.ccc-mf-*` - Modern favorite buttons
+- `.ccc-training-*` - Training session elements
+- `.ccc-session-*` - Individual session cards
+- `.ccc-dialog-*` - Pop-up dialogs
 
-### 1.4.1
-Tested on WordPress 6.0.
+### Color variables:
+```css
+--ccc-brand: #F77F00;     /* Primary orange */
+--ccc-brand2: #4169E1;    /* Royal blue */
+--ccc-slate-*: /* Gray shades */
+```
 
-### 1.4.0
-Add a load more button and a shortcode attribute `excerpt=""` in the list view.
+## Example Pages
 
-### 1.3.2
-Fixed PHP undefined variable notice.
+### Page: Drills Overview
+```html
+[ccc_my_favorite_select_button text="Add to training"]
+```
 
-### 1.3.1
-Fixed PHP 8.0 warning.
+### Page: My Favorites
+```html
+[ccc_my_favorite_list_results posts_per_page="20" excerpt="100"]
+[ccc_my_training_save_button text="Save as training"]
+```
 
-### 1.3.0
-Add shortcode for custom list view.
+### Page: My Training Sessions
+```html
+[ccc_my_training_sessions_list title="My Hockey Training Sessions" show_search="true" show_filter="true"]
+```
 
-### 1.2.1
-[Bug fix] about load JavaScript.
+## Technical Details
 
-### 1.2.0
-Load CSS and JavaScript only when using shortcodes and modify CSS.
+- The plugin stores training sessions in WordPress user meta
+- Supports both logged-in and non-logged-in users
+- Non-logged-in users use localStorage
+- Fully compatible with the original My Favorites functionality
 
-### 1.1.0
-Add shortcode attribute (`style=""`) and modify CSS.
+## Shortcode Parameters
 
-### 1.0.1
-Modify default slug of shortcode (`[ccc_my_favorite_list_menu slug=""]`) to "favorites" from "ccc-favorite" and modify readme.txt, description.
+### [ccc_my_training_save_button]
+- `text` - Button text (default: "Save Training Session")
+- `class` - Additional CSS classes
 
-### 1.0.0
-Initial release.
+### [ccc_my_training_sessions_list]
+- `title` - Section title (default: "My Training Sessions")
+- `show_search` - Show search bar (default: "true")
+- `show_filter` - Show filter dropdown (default: "true")
+- `class` - Additional CSS classes
+
+### [ccc_my_favorite_select_button]
+- `post_id` - Specific post ID (optional, uses current post if not specified)
+- `text` - Button text (default: "Favorite")
+- `style` - Style variant (default: "1")
+
+### [ccc_my_favorite_list_results]
+- `class` - Additional CSS classes
+- `style` - Style variant (default: "1")
+- `posts_per_page` - Number of posts to show (default: "100")
+- `excerpt` - Excerpt character length (default: "0" - no excerpt)
+
+## Support
+
+For questions or issues, please contact the website administrator.

@@ -10,14 +10,20 @@ require( CCCMYFAVORITE_PLUGIN_PATH .'/addons/ccc-post_thumbnail/ccc-post_thumbna
 class CCC_My_Favorite {
 
   const CCC_MY_FAVORITE_POST_IDS = 'ccc_my_favorite_post_ids';
+  const CCC_MY_TRAINING_SESSIONS = 'ccc_my_training_sessions';
 
   /*** Initial execution ***/
   public function __construct() {
     add_action( 'wp_enqueue_scripts', array( $this, 'jquery_check' ) );
     add_action( 'wp_enqueue_scripts', array( $this, 'select_styles' ) );
     add_action( 'wp_enqueue_scripts', array( $this, 'select_scripts' ) );
+    add_action( 'wp_enqueue_scripts', array( $this, 'training_styles' ) );
+    add_action( 'wp_enqueue_scripts', array( $this, 'training_scripts' ) );
     add_action( 'wp_ajax_ccc_my_favorite-update-action', array( $this, 'usermeta_my_favorite_update') );
     add_action( 'wp_ajax_ccc_my_favorite-get-action', array( $this, 'usermeta_my_favorite_get') );
+    add_action( 'wp_ajax_ccc_my_training-save-action', array( $this, 'save_training_session') );
+    add_action( 'wp_ajax_ccc_my_training-get-action', array( $this, 'get_training_sessions') );
+    add_action( 'wp_ajax_ccc_my_training-delete-action', array( $this, 'delete_training_session') );
 
     add_action( 'wp_enqueue_scripts', array( $this, 'list_styles' ) );
     add_action( 'wp_enqueue_scripts', array( $this, 'list_scripts' ) );
@@ -31,6 +37,10 @@ class CCC_My_Favorite {
 
   public function select_styles() {
     wp_enqueue_style( 'ccc_my_favorite-select', CCCMYFAVORITE_PLUGIN_URL.'/assets/select.css', array(), CCCMYFAVORITE_PLUGIN_VERSION, 'all');
+  } //endfunction
+  
+  public function training_styles() {
+    wp_enqueue_style( 'ccc_my_training-sessions', CCCMYFAVORITE_PLUGIN_URL.'/assets/training-sessions.css', array(), CCCMYFAVORITE_PLUGIN_VERSION, 'all');
   } //endfunction
 
   public function select_scripts() {
@@ -55,6 +65,26 @@ class CCC_My_Favorite {
                          'nonce'  => wp_create_nonce( $action_get )
                        )
                       );
+  } //endfunction
+  
+  public function training_scripts() {
+    $handle = 'ccc_my_training-sessions';
+    $file = 'training-sessions.js';
+    wp_register_script( $handle, CCCMYFAVORITE_PLUGIN_URL.'/assets/'.$file, array( 'jquery' ), CCCMYFAVORITE_PLUGIN_VERSION, true );
+    wp_enqueue_script( $handle );
+    
+    // Localize scripts for training sessions
+    wp_localize_script( $handle, 'CCC_MY_TRAINING',
+      array(
+        'api' => admin_url( 'admin-ajax.php' ),
+        'save_action' => 'ccc_my_training-save-action',
+        'save_nonce' => wp_create_nonce( 'ccc_my_training-save-action' ),
+        'get_action' => 'ccc_my_training-get-action',
+        'get_nonce' => wp_create_nonce( 'ccc_my_training-get-action' ),
+        'delete_action' => 'ccc_my_training-delete-action',
+        'delete_nonce' => wp_create_nonce( 'ccc_my_training-delete-action' )
+      )
+    );
   } //endfunction
 
   /*** お気に入りの投稿をユーザーメタ（usermeta）に追加 ***/
@@ -113,5 +143,74 @@ class CCC_My_Favorite {
     echo $data;
     die();
   } //endfunction
+
+  /*** Trainingsessie opslaan met datum/week ***/
+  public function save_training_session() {
+    if( check_ajax_referer( $_POST['action'], 'nonce', false ) ) {
+      $user_id = wp_get_current_user()->ID;
+      $sessions = get_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, true );
+      
+      if( !is_array($sessions) ) {
+        $sessions = array();
+      }
+      
+      $session_data = array(
+        'id' => uniqid('session_'),
+        'name' => sanitize_text_field( $_POST['session_name'] ),
+        'date' => sanitize_text_field( $_POST['session_date'] ),
+        'week' => sanitize_text_field( $_POST['session_week'] ),
+        'post_ids' => sanitize_text_field( $_POST['post_ids'] ),
+        'created' => current_time('mysql')
+      );
+      
+      $sessions[] = $session_data;
+      update_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, $sessions );
+      
+      wp_send_json_success( $session_data );
+    } else {
+      wp_send_json_error( 'Forbidden' );
+    }
+    die();
+  }
+  
+  /*** Alle trainingsessies ophalen ***/
+  public function get_training_sessions() {
+    if( check_ajax_referer( $_POST['action'], 'nonce', false ) ) {
+      $user_id = wp_get_current_user()->ID;
+      $sessions = get_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, true );
+      
+      if( !is_array($sessions) ) {
+        $sessions = array();
+      }
+      
+      wp_send_json_success( $sessions );
+    } else {
+      wp_send_json_error( 'Forbidden' );
+    }
+    die();
+  }
+  
+  /*** Trainingsessie verwijderen ***/
+  public function delete_training_session() {
+    if( check_ajax_referer( $_POST['action'], 'nonce', false ) ) {
+      $user_id = wp_get_current_user()->ID;
+      $session_id = sanitize_text_field( $_POST['session_id'] );
+      $sessions = get_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, true );
+      
+      if( is_array($sessions) ) {
+        $sessions = array_filter($sessions, function($session) use ($session_id) {
+          return $session['id'] !== $session_id;
+        });
+        
+        update_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, array_values($sessions) );
+        wp_send_json_success();
+      } else {
+        wp_send_json_error( 'No sessions found' );
+      }
+    } else {
+      wp_send_json_error( 'Forbidden' );
+    }
+    die();
+  }
 
 } //endclass

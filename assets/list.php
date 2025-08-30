@@ -7,16 +7,35 @@ if( ! class_exists( 'CCC_My_Favorite_List' ) ) {
   class CCC_My_Favorite_List {
 
     public static function action() {
+      /*** Check if loading a specific training session ***/
+      $session_id = isset($_POST['session_id']) ? sanitize_text_field($_POST['session_id']) : null;
+      $session_data = null;
+      
+      if ($session_id && is_user_logged_in()) {
+        $sessions = get_user_meta(wp_get_current_user()->ID, CCC_My_Favorite::CCC_MY_TRAINING_SESSIONS, true);
+        if (is_array($sessions)) {
+          foreach ($sessions as $session) {
+            if ($session['id'] === $session_id) {
+              $session_data = $session;
+              $my_favorite_post_ids = explode(',', $session['post_ids']);
+              break;
+            }
+          }
+        }
+      }
+      
       /*** お気に入りの投稿のデータ（カンマ連結文字列）を取得 ***/
-      if ( is_user_logged_in() == false ) {
-        /* ログインユーザーでは無い場合 */
-        $ccc_my_favorite_post = sanitize_text_field( $_POST['ccc-my_favorite_post'] );
-        $my_favorite_post_ids = explode(',', $ccc_my_favorite_post); // 指定した値で分割した文字列の配列を返す
-      } else {
-        /* MySQLのユーザーメタ（usermeta）からユーザーが選んだ投稿IDを取得 */
-        $user_favorite_post_ids = get_user_meta( wp_get_current_user()->ID, CCC_My_Favorite::CCC_MY_FAVORITE_POST_IDS, true );
-        //var_dump($favorite_post_user);
-        $my_favorite_post_ids = explode(',', $user_favorite_post_ids);
+      if (!isset($my_favorite_post_ids)) {
+        if ( is_user_logged_in() == false ) {
+          /* ログインユーザーでは無い場合 */
+          $ccc_my_favorite_post = sanitize_text_field( $_POST['ccc-my_favorite_post'] );
+          $my_favorite_post_ids = explode(',', $ccc_my_favorite_post); // 指定した値で分割した文字列の配列を返す
+        } else {
+          /* MySQLのユーザーメタ（usermeta）からユーザーが選んだ投稿IDを取得 */
+          $user_favorite_post_ids = get_user_meta( wp_get_current_user()->ID, CCC_My_Favorite::CCC_MY_FAVORITE_POST_IDS, true );
+          //var_dump($favorite_post_user);
+          $my_favorite_post_ids = explode(',', $user_favorite_post_ids);
+        }
       }
       $my_favorite_post_ids = array_map('htmlspecialchars', $my_favorite_post_ids); // 配列データを一括でサニタイズする
 
@@ -61,8 +80,19 @@ if( ! class_exists( 'CCC_My_Favorite_List' ) ) {
 ?>
 
 <div class="header-ccc_favorite clearfix">
-  <p id="ccc-favorite-count"><span class="name"><?php printf( _n( 'Favorite item', 'Favorite items', $the_query->post_count, CCCMYFAVORITE_TEXT_DOMAIN ), $the_query->post_count ); ?></span><span class="number"><?php echo $the_query->post_count; ?></span><span class="found_posts"></span><span class="unit"></span></p><!-- /#ccc-favorite-count -->
-  <div class="ccc-favorite-post-delete" data-ccc_favorite-delete_all=true><a href="#" class="ccc-favorite-post-delete-button"><span class="text"><?php _e('Delete all', CCCMYFAVORITE_TEXT_DOMAIN); ?></span></a></div><!-- /.ccc-favorite-post-delate -->
+  <?php if ($session_data): ?>
+    <div class="ccc-session-info">
+      <h2 class="ccc-session-loaded-title"><?php echo esc_html($session_data['name']); ?></h2>
+      <p class="ccc-session-loaded-meta">
+        <?php echo $session_data['week'] ? 'Week ' . esc_html($session_data['week']) : esc_html($session_data['date']); ?>
+      </p>
+    </div>
+  <?php endif; ?>
+  <p id="ccc-favorite-count"><span class="name"><?php printf( _n( 'Drill', 'Drills', $the_query->post_count, CCCMYFAVORITE_TEXT_DOMAIN ), $the_query->post_count ); ?></span><span class="number"><?php echo $the_query->post_count; ?></span><span class="found_posts"></span><span class="unit"></span></p><!-- /#ccc-favorite-count -->
+  <div class="ccc-action-buttons">
+    <button class="ccc-save-training-session">Save Training Session</button>
+    <div class="ccc-favorite-post-delete" data-ccc_favorite-delete_all=true><a href="#" class="ccc-favorite-post-delete-button"><span class="text"><?php _e('Delete all', CCCMYFAVORITE_TEXT_DOMAIN); ?></span></a></div><!-- /.ccc-favorite-post-delate -->
+  </div>
 </div><!-- /.header-ccc_favorite -->
 
 
@@ -113,7 +143,7 @@ if( ! class_exists( 'CCC_My_Favorite_List' ) ) {
       } else {
 ?>
 <div class="no-post">
-  <p><?php _e('There are no favorite items.', CCCMYFAVORITE_TEXT_DOMAIN); ?></p>
+  <p><?php _e('No favorite drills selected yet.', CCCMYFAVORITE_TEXT_DOMAIN); ?></p>
 </div><!-- /.no-post -->
 <?php
              } //endif

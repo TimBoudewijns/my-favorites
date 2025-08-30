@@ -58,9 +58,12 @@ if (! class_exists('CCC_My_Favorite')) {
   * [ccc_my_favorite_select_button post_id="int" text="string" style="string"]
   * [ccc_my_favorite_list_menu slug="string" text="string" style="string"]
   * [ccc_my_favorite_list_results class="string" style="string" posts_per_page="int" excerpt="int"]
+  * [ccc_my_training_save_button text="string" class="string"]
+  * [ccc_my_training_sessions_list title="string" show_search="true/false" show_filter="true/false" class="string"]
   */
   require(CCCMYFAVORITE_PLUGIN_PATH . '/assets/shortcode-select.php');
   require(CCCMYFAVORITE_PLUGIN_PATH . '/assets/shortcode-list.php');
+  require(CCCMYFAVORITE_PLUGIN_PATH . '/assets/shortcode-training.php');
 
   /****** Uninstall ******/
   require(CCCMYFAVORITE_PLUGIN_PATH . '/assets/uninstall.php');
