@@ -1,0 +1,644 @@
+/*
+* Modern Hockey Training Styles
+* Based on Field Hockey Platform design
+*/
+
+:root {
+  --ccc-brand: #F77F00;     /* primary orange */
+  --ccc-brand2: #4169E1;    /* royal blue */
+  --ccc-slate-50: #f8fafc;
+  --ccc-slate-100: #f1f5f9;
+  --ccc-slate-200: #e2e8f0;
+  --ccc-slate-300: #cbd5e1;
+  --ccc-slate-600: #475569;
+  --ccc-slate-700: #334155;
+  --ccc-slate-900: #0f172a;
+  --ccc-white: #ffffff;
+  --ccc-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 1px rgba(15, 23, 42, 0.04);
+  --ccc-shadow-hover: 0 8px 24px rgba(15,23,42,.08);
+}
+
+/* Modal Styles */
+.ccc-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999999;
+  animation: fadeIn 0.2s ease;
+}
+
+.ccc-modal-content {
+  background: var(--ccc-white);
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: slideUp 0.3s ease;
+}
+
+.ccc-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--ccc-slate-200);
+}
+
+.ccc-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--ccc-slate-900);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ccc-modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--ccc-slate-600);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.ccc-modal-close:hover {
+  background: var(--ccc-slate-100);
+  color: var(--ccc-slate-900);
+}
+
+.ccc-modal-body {
+  padding: 1.5rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Current Trainings Section */
+.ccc-current-trainings {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: var(--ccc-slate-50);
+  border-radius: 0.75rem;
+  border: 1px solid var(--ccc-slate-200);
+}
+
+.ccc-current-trainings h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ccc-slate-900);
+}
+
+.ccc-current-trainings ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ccc-current-trainings li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--ccc-white);
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ccc-remove-btn {
+  padding: 0.25rem 0.75rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ccc-remove-btn:hover {
+  background: #dc2626;
+  color: var(--ccc-white);
+}
+
+/* Training Selection Grid */
+.ccc-training-list h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--ccc-slate-900);
+}
+
+.ccc-training-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ccc-training-card.ccc-modal-card {
+  background: var(--ccc-white);
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ccc-training-card.ccc-modal-card:hover {
+  border-color: var(--ccc-brand2);
+  transform: translateY(-2px);
+  box-shadow: var(--ccc-shadow-hover);
+}
+
+.ccc-training-card.selected {
+  border-color: var(--ccc-brand);
+  background: rgba(247, 127, 0, 0.05);
+}
+
+.ccc-training-card h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ccc-slate-900);
+}
+
+.ccc-training-date {
+  display: block;
+  font-size: 0.875rem;
+  color: var(--ccc-slate-600);
+  margin-bottom: 0.5rem;
+}
+
+.ccc-drill-count {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: var(--ccc-slate-100);
+  color: var(--ccc-slate-700);
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.ccc-select-training {
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: var(--ccc-brand2);
+  color: var(--ccc-white);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ccc-select-training:hover {
+  opacity: 0.9;
+}
+
+.ccc-select-training:disabled {
+  background: var(--ccc-slate-300);
+  cursor: not-allowed;
+}
+
+/* New Training Form */
+.ccc-new-training-section {
+  border-top: 1px solid var(--ccc-slate-200);
+  padding-top: 1.5rem;
+}
+
+.ccc-create-new-training {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--ccc-brand);
+  color: var(--ccc-white);
+  border: none;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ccc-create-new-training:hover {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.ccc-new-training-form {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.ccc-new-training-form input {
+  padding: 0.75rem;
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.ccc-new-training-form input:focus {
+  outline: none;
+  border-color: var(--ccc-brand2);
+  box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
+}
+
+.ccc-save-new-training {
+  padding: 0.75rem;
+  background: var(--ccc-brand);
+  color: var(--ccc-white);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ccc-save-new-training:hover {
+  opacity: 0.9;
+}
+
+/* Gallery Styles */
+.ccc-training-gallery-container {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ccc-gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ccc-gallery-header h2 {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--ccc-slate-900);
+  margin: 0;
+}
+
+.ccc-gallery-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+#ccc-training-search {
+  min-width: 250px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+#ccc-training-search:focus {
+  outline: none;
+  border-color: var(--ccc-brand2);
+  box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
+}
+
+#ccc-training-filter {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 0.75rem;
+  background: var(--ccc-white);
+  cursor: pointer;
+}
+
+/* Training Cards in Gallery */
+#ccc-training-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.ccc-training-card {
+  background: var(--ccc-white);
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  box-shadow: var(--ccc-shadow-card);
+}
+
+.ccc-training-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--ccc-shadow-hover);
+}
+
+.ccc-training-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.ccc-training-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--ccc-slate-900);
+  flex: 1;
+}
+
+.ccc-delete-training {
+  background: transparent;
+  border: none;
+  color: var(--ccc-slate-600);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.ccc-delete-training:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.ccc-training-meta {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.ccc-training-date {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background: rgba(247, 127, 0, 0.1);
+  color: var(--ccc-brand);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.ccc-drill-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background: var(--ccc-slate-100);
+  color: var(--ccc-slate-700);
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Drills Preview */
+.ccc-drills-preview {
+  padding: 0 1.5rem 1rem;
+}
+
+.ccc-drills-summary {
+  color: var(--ccc-slate-600);
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.ccc-drill-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ccc-drill-thumb {
+  background: var(--ccc-slate-50);
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.ccc-drill-thumb:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--ccc-shadow-card);
+}
+
+.ccc-drill-thumb img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
+}
+
+.ccc-drill-thumb h5 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--ccc-slate-900);
+}
+
+.ccc-drill-thumb button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border: none;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin: 0.125rem;
+}
+
+.ccc-remove-from-training {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.ccc-remove-from-training:hover {
+  background: #dc2626;
+  color: var(--ccc-white);
+}
+
+.ccc-assign-to-training {
+  background: var(--ccc-brand);
+  color: var(--ccc-white);
+}
+
+.ccc-assign-to-training:hover {
+  opacity: 0.8;
+}
+
+/* Training Actions */
+.ccc-training-actions {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--ccc-slate-100);
+}
+
+.ccc-view-training-drills {
+  width: 100%;
+  padding: 0.75rem;
+  background: var(--ccc-brand2);
+  color: var(--ccc-white);
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.ccc-view-training-drills:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Unassigned Drills Special Styling */
+.ccc-unassigned-drills {
+  border: 2px dashed var(--ccc-slate-300);
+  background: var(--ccc-slate-50);
+}
+
+.ccc-unassigned-drills .ccc-training-header h3 {
+  color: var(--ccc-slate-600);
+}
+
+.ccc-no-trainings {
+  text-align: center;
+  padding: 3rem;
+  color: var(--ccc-slate-600);
+  font-size: 1.125rem;
+  background: var(--ccc-slate-50);
+  border-radius: 1rem;
+  border: 1px dashed var(--ccc-slate-300);
+}
+
+/* Updated Favorite Button */
+.ccc-favorite-post-toggle-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--ccc-brand2);
+  color: var(--ccc-brand2);
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.ccc-favorite-post-toggle-button:hover {
+  background: var(--ccc-brand2);
+  color: var(--ccc-white);
+  transform: translateY(-2px);
+}
+
+.ccc-favorite-post-toggle-button.save {
+  background: var(--ccc-brand2);
+  color: var(--ccc-white);
+}
+
+.ccc-favorite-post-toggle-button::before {
+  content: "♡";
+  font-size: 1.2em;
+}
+
+.ccc-favorite-post-toggle-button.save::before {
+  content: "♥";
+}
+
+/* Gallery Filter Controls */
+.ccc-gallery-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.ccc-gallery-controls input,
+.ccc-gallery-controls select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ccc-slate-200);
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  background: var(--ccc-white);
+  transition: all 0.2s ease;
+}
+
+.ccc-gallery-controls input:focus,
+.ccc-gallery-controls select:focus {
+  outline: none;
+  border-color: var(--ccc-brand2);
+  box-shadow: 0 0 0 3px rgba(65, 105, 225, 0.1);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ccc-modal-content {
+    width: 95%;
+    max-height: 90vh;
+  }
+  
+  .ccc-gallery-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .ccc-gallery-controls {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .ccc-gallery-controls input,
+  .ccc-gallery-controls select {
+    width: 100%;
+  }
+  
+  #ccc-training-gallery {
+    grid-template-columns: 1fr;
+  }
+  
+  .ccc-training-grid {
+    grid-template-columns: 1fr;
+  }
+}

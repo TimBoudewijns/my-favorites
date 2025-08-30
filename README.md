@@ -2,124 +2,69 @@
 
 This enhanced version of the My Favorites plugin has been specifically developed for hockey coaches to create and manage training sessions.
 
-## New Features
+## How It Works
 
-### 1. Save Training Sessions
-Coaches can now save their selected favorite drills as a complete training session with:
-- A name for the training session
-- A date or week number
-- All selected drills
+### For Coaches:
 
-### 2. Group Training Sessions
-Training sessions are automatically grouped by:
-- Week number
-- Date
-This makes it easy to find training sessions for specific periods.
+1. **Adding Drills to Training Sessions**:
+   - On any drill page, click the "Favorite" button
+   - A modal will appear showing all your training sessions
+   - Select an existing training session OR create a new one
+   - The drill is automatically added to that training session
 
-### 3. Search and Filter
-- **Search function**: Search training sessions by name
-- **Filter options**: Filter by week, month, or custom period
+2. **Creating New Training Sessions**:
+   - When clicking "Favorite" on a drill, you can create a new training session
+   - Enter a name and date for the training
+   - The drill is automatically added to the new session
 
-### 4. Modern Styling
-The plugin now uses modern CSS styling based on the Field Hockey Platform design with:
-- Modern card-based layouts
+3. **Managing Training Sessions**:
+   - View all your training sessions in a modern gallery layout
+   - Each training shows its drills as thumbnails
+   - Search and filter training sessions by name or date
+   - Remove drills from training sessions
+   - Delete entire training sessions
+
+## Key Features
+
+### ✅ Modal-Based Drill Assignment
+- Click any "Favorite" button to see assignment modal
+- Shows current training sessions for that drill
+- Create new training sessions on-the-fly
+- Works on every drill post page
+
+### ✅ Training Gallery View
+- Modern card-based layout inspired by Field Hockey Platform design
+- Groups drills by training session
+- Shows "Unassigned Drills" for drills not in any training
+- Expandable drill thumbnails for each training
+
+### ✅ Smart Organization
+- Drills without training assignments are grouped as "Unassigned"
+- Easy to assign unassigned drills to training sessions
+- Remove drills from training sessions with one click
+- Delete entire training sessions
+
+### ✅ Modern Styling
+- Based on Field Hockey Platform design (html.html)
+- Orange (#F77F00) and blue (#4169E1) color scheme
 - Responsive design for all devices
-- Professional colors (orange #F77F00 and blue #4169E1)
+- Unique CSS classes (ccc-mf-*, ccc-training-*) to avoid conflicts
 
 ## Shortcodes
 
-### Existing shortcodes (remain functional):
+### Original shortcodes (work as before):
 ```
-[ccc_my_favorite_select_button] - Favorite button for a drill
-[ccc_my_favorite_list_menu] - Menu showing number of favorites
-[ccc_my_favorite_list_results] - List of favorite drills
+[ccc_my_favorite_select_button] - Shows modal to assign drill to training
+[ccc_my_favorite_list_menu] - Shows favorite count badge  
+[ccc_my_favorite_list_results] - Shows all favorite drills
 ```
 
 ### New shortcodes:
 ```
-[ccc_my_training_save_button] - Button to save current selection as training session
-[ccc_my_training_sessions_list] - Overview of all saved training sessions
+[ccc_my_training_gallery] - Shows training sessions gallery with drills
 ```
-
-## Usage
-
-### For coaches:
-
-1. **Select drills**: 
-   - Browse through the drills on the website
-   - Click "Favorite" for each drill you want to add
-
-2. **Save training session**:
-   - Go to the favorites overview
-   - Click "Save Training Session"
-   - Give the training session a name
-   - Select a date or week number
-   - Click "Save"
-
-3. **Load training session**:
-   - Go to "My Training Sessions"
-   - Find the desired session (use search/filter if needed)
-   - Click "Load training" to load all drills from that session
-
-## Installation
-
-1. Upload the plugin folder to `/wp-content/plugins/`
-2. Activate the plugin via the WordPress admin panel
-3. Add the shortcodes to the desired pages
-
-## CSS Customization
-
-If you want to customize the styling, use the following CSS classes:
-
-### New CSS classes (to avoid conflicts):
-- `.ccc-mf-*` - Modern favorite buttons
-- `.ccc-training-*` - Training session elements
-- `.ccc-session-*` - Individual session cards
-- `.ccc-dialog-*` - Pop-up dialogs
-
-### Color variables:
-```css
---ccc-brand: #F77F00;     /* Primary orange */
---ccc-brand2: #4169E1;    /* Royal blue */
---ccc-slate-*: /* Gray shades */
-```
-
-## Example Pages
-
-### Page: Drills Overview
-```html
-[ccc_my_favorite_select_button text="Add to training"]
-```
-
-### Page: My Favorites
-```html
-[ccc_my_favorite_list_results posts_per_page="20" excerpt="100"]
-[ccc_my_training_save_button text="Save as training"]
-```
-
-### Page: My Training Sessions
-```html
-[ccc_my_training_sessions_list title="My Hockey Training Sessions" show_search="true" show_filter="true"]
-```
-
-## Technical Details
-
-- The plugin stores training sessions in WordPress user meta
-- Supports both logged-in and non-logged-in users
-- Non-logged-in users use localStorage
-- Fully compatible with the original My Favorites functionality
 
 ## Shortcode Parameters
-
-### [ccc_my_training_save_button]
-- `text` - Button text (default: "Save Training Session")
-- `class` - Additional CSS classes
-
-### [ccc_my_training_sessions_list]
-- `title` - Section title (default: "My Training Sessions")
-- `show_search` - Show search bar (default: "true")
-- `show_filter` - Show filter dropdown (default: "true")
-- `class` - Additional CSS classes
 
 ### [ccc_my_favorite_select_button]
 - `post_id` - Specific post ID (optional, uses current post if not specified)
@@ -128,9 +73,63 @@ If you want to customize the styling, use the following CSS classes:
 
 ### [ccc_my_favorite_list_results]
 - `class` - Additional CSS classes
-- `style` - Style variant (default: "1")
+- `style` - Style variant (default: "1") 
 - `posts_per_page` - Number of posts to show (default: "100")
 - `excerpt` - Excerpt character length (default: "0" - no excerpt)
+
+### [ccc_my_training_gallery]
+- `title` - Gallery title (default: "My Training Sessions")
+- `show_search` - Show search bar (default: "true")
+- `show_filter` - Show filter dropdown (default: "true")
+- `class` - Additional CSS classes
+
+## Example Usage
+
+### On Drill Pages:
+```html
+[ccc_my_favorite_select_button text="Add to Training"]
+```
+
+### Favorites Overview Page:
+```html
+[ccc_my_favorite_list_results posts_per_page="20" excerpt="100"]
+```
+
+### Training Gallery Page:
+```html
+[ccc_my_training_gallery title="My Hockey Training Sessions" show_search="true" show_filter="true"]
+```
+
+## Database Structure
+
+The plugin uses WordPress user meta to store:
+- `ccc_my_favorite_post_ids` - Legacy favorite posts (for backward compatibility)
+- `ccc_my_training_sessions` - Training session metadata (name, date, id)
+- `ccc_my_training_drills` - Drill-to-training relationships
+
+## Technical Features
+
+- **Backward Compatible**: All existing shortcodes continue to work
+- **User-Friendly**: Modal-based interaction for easy drill assignment
+- **Responsive**: Works on all devices and screen sizes
+- **Modern Design**: Based on Field Hockey Platform styling
+- **Conflict-Free**: Unique CSS classes prevent styling conflicts
+
+## CSS Classes Used
+
+To avoid conflicts with existing site CSS, the plugin uses prefixed classes:
+- `.ccc-mf-*` - Modern favorite buttons
+- `.ccc-training-*` - Training session elements
+- `.ccc-modal-*` - Modal dialog elements
+- `.ccc-gallery-*` - Gallery layout elements
+
+## Installation
+
+1. Upload the plugin folder to `/wp-content/plugins/`
+2. Activate the plugin via the WordPress admin panel
+3. Add shortcodes to your pages:
+   - Add `[ccc_my_favorite_select_button]` to drill pages
+   - Add `[ccc_my_training_gallery]` to create a training sessions page
 
 ## Support
 

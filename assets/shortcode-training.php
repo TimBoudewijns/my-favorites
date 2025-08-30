@@ -7,6 +7,7 @@ if( ! class_exists( 'CCC_My_Training_ShortCode' ) ) {
 
   add_shortcode('ccc_my_training_save_button', array('CCC_My_Training_ShortCode', 'save_button') );
   add_shortcode('ccc_my_training_sessions_list', array('CCC_My_Training_ShortCode', 'sessions_list') );
+  add_shortcode('ccc_my_training_gallery', array('CCC_My_Training_ShortCode', 'training_gallery') );
 
   class CCC_My_Training_ShortCode {
 
@@ -67,6 +68,55 @@ if( ! class_exists( 'CCC_My_Training_ShortCode' ) ) {
       // Sessions list container
       $html .= '<div id="ccc-training-sessions-list">';
       $html .= '<div class="ccc-no-sessions">Training sessions will be loaded here...</div>';
+      $html .= '</div>';
+      
+      $html .= '</div>';
+      
+      return $html;
+    }
+    
+    public static function training_gallery($atts) {
+      $atts = shortcode_atts(array(
+        "title" => 'My Training Sessions',
+        "show_search" => 'true',
+        "show_filter" => 'true',
+        "class" => '',
+      ), $atts);
+      
+      $title = esc_html($atts['title']);
+      $show_search = $atts['show_search'] === 'true';
+      $show_filter = $atts['show_filter'] === 'true';
+      $class = esc_attr($atts['class']);
+      
+      $html = '<div class="ccc-training-gallery-container ' . $class . '">';
+      
+      // Header
+      $html .= '<div class="ccc-gallery-header">';
+      $html .= '<h2>' . $title . '</h2>';
+      $html .= '</div>';
+      
+      // Controls
+      if ($show_search || $show_filter) {
+        $html .= '<div class="ccc-gallery-controls">';
+        
+        if ($show_search) {
+          $html .= '<input type="text" id="ccc-training-search" placeholder="Search training sessions...">';
+        }
+        
+        if ($show_filter) {
+          $html .= '<select id="ccc-training-filter">';
+          $html .= '<option value="">All trainings</option>';
+          $html .= '<option value="week">This week</option>';
+          $html .= '<option value="month">This month</option>';
+          $html .= '</select>';
+        }
+        
+        $html .= '</div>';
+      }
+      
+      // Gallery container
+      $html .= '<div id="ccc-training-gallery">';
+      $html .= '<div class="ccc-no-trainings">Loading training sessions...</div>';
       $html .= '</div>';
       
       $html .= '</div>';

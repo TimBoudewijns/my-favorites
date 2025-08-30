@@ -55,11 +55,10 @@ if (! class_exists('CCC_My_Favorite')) {
 
   /*** How to use this Shortcode ***/
   /*
-  * [ccc_my_favorite_select_button post_id="int" text="string" style="string"]
-  * [ccc_my_favorite_list_menu slug="string" text="string" style="string"]
-  * [ccc_my_favorite_list_results class="string" style="string" posts_per_page="int" excerpt="int"]
-  * [ccc_my_training_save_button text="string" class="string"]
-  * [ccc_my_training_sessions_list title="string" show_search="true/false" show_filter="true/false" class="string"]
+  * [ccc_my_favorite_select_button post_id="int" text="string" style="string"] - Shows modal to assign drill to training
+  * [ccc_my_favorite_list_menu slug="string" text="string" style="string"] - Shows favorite count badge
+  * [ccc_my_favorite_list_results class="string" style="string" posts_per_page="int" excerpt="int"] - Shows favorite drills list
+  * [ccc_my_training_gallery title="string" show_search="true/false" show_filter="true/false" class="string"] - Shows training gallery
   */
   require(CCCMYFAVORITE_PLUGIN_PATH . '/assets/shortcode-select.php');
   require(CCCMYFAVORITE_PLUGIN_PATH . '/assets/shortcode-list.php');
