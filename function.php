@@ -397,13 +397,46 @@ class CCC_My_Favorite {
             return $drill['post_id'] != $post_id;
           });
         } else {
-          // Remove from specific training or mark as unassigned
-          foreach($drills as $key => &$drill) {
+          // Remove this specific drill-training combination
+          $new_drills = array();
+          $drill_still_assigned = false;
+          
+          // First pass: remove the specific combination and check if drill is still assigned elsewhere
+          foreach($drills as $drill) {
             if($drill['post_id'] == $post_id && $drill['training_id'] == $training_id) {
-              $drill['training_id'] = 'none'; // Mark as unassigned instead of deleting
-              break;
+              // Skip this combination (effectively removing it)
+              continue;
+            } else {
+              $new_drills[] = $drill;
+              // Check if this drill is still assigned to another training
+              if($drill['post_id'] == $post_id && $drill['training_id'] !== 'none') {
+                $drill_still_assigned = true;
+              }
             }
           }
+          
+          // Only add as unassigned if drill is not in any other training
+          if(!$drill_still_assigned) {
+            // Check if drill was actually removed (was in the training)
+            $was_removed = false;
+            foreach($drills as $drill) {
+              if($drill['post_id'] == $post_id && $drill['training_id'] == $training_id) {
+                $was_removed = true;
+                break;
+              }
+            }
+            
+            if($was_removed) {
+              // Add as unassigned since it's not in any training anymore
+              $new_drills[] = array(
+                'post_id' => $post_id,
+                'training_id' => 'none',
+                'updated' => current_time('mysql')
+              );
+            }
+          }
+          
+          $drills = $new_drills;
         }
         
         update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, array_values($drills) );
