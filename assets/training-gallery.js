@@ -37,11 +37,18 @@ var CCC = CCC || {};
           nonce: CCC_MY_TRAINING.get_nonce
         },
         success: function(response) {
+          console.log('Training gallery response:', response);
           if (response.success) {
             self.allSessions = response.data.sessions || [];
             self.allUnassigned = response.data.unassigned || [];
+            console.log('Loaded sessions:', self.allSessions.length, 'unassigned:', self.allUnassigned.length);
             self.displayGallery();
+          } else {
+            console.error('Failed to load training sessions');
           }
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX error loading training sessions:', error);
         }
       });
     },
@@ -75,14 +82,14 @@ var CCC = CCC || {};
     createUnassignedSection: function() {
       return '<div class="ccc-training-card ccc-unassigned-drills">' +
         '<div class="ccc-training-header">' +
-        '<h3>Unassigned Drills</h3>' +
+        '<h3 style="font-size: 18px !important; margin: 0 0 8px 0 !important; font-weight: 600 !important;">Unassigned Drills</h3>' +
         '<span class="ccc-drill-count">' + this.allUnassigned.length + ' drills</span>' +
         '</div>' +
         '<div class="ccc-drills-preview" data-training-id="none">' +
         '<p>Drills not assigned to any training session</p>' +
         '</div>' +
         '<div class="ccc-training-actions">' +
-        '<button class="ccc-view-training-drills" data-training-id="none">View Drills</button>' +
+        '<button class="ccc-view-training-drills" data-training-id="none" style="background-color: #ff6600 !important; color: white !important; border: none !important; padding: 8px 16px !important; border-radius: 4px !important; cursor: pointer !important;">View Drills</button>' +
         '</div>' +
         '</div>';
     },
@@ -90,7 +97,7 @@ var CCC = CCC || {};
     createTrainingCard: function(session) {
       return '<div class="ccc-training-card" data-training-id="' + session.id + '">' +
         '<div class="ccc-training-header">' +
-        '<h3>' + session.name + '</h3>' +
+        '<h3 style="font-size: 18px !important; margin: 0 0 8px 0 !important; font-weight: 600 !important;">' + session.name + '</h3>' +
         '<button class="ccc-delete-training" data-training-id="' + session.id + '">×</button>' +
         '</div>' +
         '<div class="ccc-training-meta">' +
@@ -101,7 +108,7 @@ var CCC = CCC || {};
         '<p>Loading drills...</p>' +
         '</div>' +
         '<div class="ccc-training-actions">' +
-        '<button class="ccc-view-training-drills" data-training-id="' + session.id + '">View Drills</button>' +
+        '<button class="ccc-view-training-drills" data-training-id="' + session.id + '" style="background-color: #ff6600 !important; color: white !important; border: none !important; padding: 8px 16px !important; border-radius: 4px !important; cursor: pointer !important;">View Drills</button>' +
         '</div>' +
         '</div>';
     },
@@ -145,7 +152,7 @@ var CCC = CCC || {};
                 '<a href="' + post.permalink + '">' +
                 '<img src="' + post.thumbnail + '" alt="' + post.title + '" />' +
                 '</a>' +
-                '<h5><a href="' + post.permalink + '">' + post.title + '</a></h5>' +
+                '<h5 style="font-size: 14px !important; margin: 4px 0 !important; font-weight: 500 !important;"><a href="' + post.permalink + '" style="text-decoration: none !important;">' + post.title + '</a></h5>' +
                 '<div class="ccc-drill-actions">' +
                 '<button class="ccc-remove-from-training" data-post-id="' + post.id + '" data-training-id="' + trainingId + '">Remove</button>';
                 
@@ -175,7 +182,10 @@ var CCC = CCC || {};
       drillsContainer.slideToggle();
       
       var button = $(e.currentTarget);
-      button.text(button.text() === 'View Drills' ? 'Hide Drills' : 'View Drills');
+      var newText = button.text() === 'View Drills' ? 'Hide Drills' : 'View Drills';
+      button.text(newText);
+      // Ensure orange styling is maintained
+      button.attr('style', 'background-color: #ff6600 !important; color: white !important; border: none !important; padding: 8px 16px !important; border-radius: 4px !important; cursor: pointer !important;');
     },
     
     deleteTraining: function(e) {

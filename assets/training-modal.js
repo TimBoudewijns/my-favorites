@@ -122,7 +122,7 @@ var CCC = CCC || {};
       }
       
       modalHtml += '<div class="ccc-training-list">' +
-        '<h3>Select Training Session:</h3>';
+        '<h3 style="font-size: 18px !important; margin: 0 0 12px 0 !important; font-weight: 600 !important;">Select Training Session:</h3>';
       
       if (sessions.length > 0) {
         modalHtml += '<div class="ccc-training-grid">';
