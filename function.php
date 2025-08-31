@@ -311,6 +311,13 @@ class CCC_My_Favorite {
       
       // Only add if this combination doesn't exist yet
       if(!$exists) {
+        // If assigning from unassigned, remove the 'none' entry first
+        if($training_id !== 'none') {
+          $drills = array_filter($drills, function($drill) use ($post_id) {
+            return !($drill['post_id'] == $post_id && $drill['training_id'] === 'none');
+          });
+        }
+        
         $drills[] = array(
           'post_id' => $post_id,
           'training_id' => $training_id,
