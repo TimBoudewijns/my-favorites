@@ -14,6 +14,7 @@ var CCC = CCC || {};
     init: function() {
       this.bindEvents();
       this.modifyFavoriteButtons();
+      this.updateCounter();
     },
     
     bindEvents: function() {
@@ -238,6 +239,9 @@ var CCC = CCC || {};
             if ($('#ccc-training-gallery').length) {
               CCC.trainingGallery.loadGallery();
             }
+            
+            // Update counter
+            self.updateCounter();
           }
         }
       });
@@ -283,6 +287,9 @@ var CCC = CCC || {};
             if ($('#ccc-training-gallery').length) {
               CCC.trainingGallery.loadGallery();
             }
+            
+            // Update counter
+            self.updateCounter();
           }
         }
       });
@@ -376,6 +383,38 @@ var CCC = CCC || {};
         // Update counter
         $('.ccc-favorite-post-count .num').text(favArray ? favArray.length : 0);
       }
+    },
+    
+    updateCounter: function() {
+      if (!CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        return; // Let select.js handle counter for non-logged-in users
+      }
+      
+      var self = this;
+      $.ajax({
+        url: CCC_MY_FAVORITE_GET.api,
+        type: 'POST',
+        data: {
+          action: CCC_MY_FAVORITE_GET.action,
+          nonce: CCC_MY_FAVORITE_GET.nonce
+        },
+        success: function(response) {
+          var count = 0;
+          if (response && response.trim()) {
+            var favorites = response.split(',').filter(function(id) {
+              return id && id.trim() !== '';
+            });
+            count = favorites.length;
+          }
+          
+          $('.ccc-favorite-post-count .num').text(count);
+          if (count > 0) {
+            $('.ccc-favorite-post-count').addClass('active');
+          } else {
+            $('.ccc-favorite-post-count').removeClass('active');
+          }
+        }
+      });
     },
     
     closeModal: function() {
