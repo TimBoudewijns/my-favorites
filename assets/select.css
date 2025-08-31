@@ -33,9 +33,15 @@
   content: "\f08a";
   /* icomoon Font =========== */
 }
+.ccc-favorite-post-toggle > a.save {
+  background-color: #dc3545 !important;
+  border: 2px solid #dc3545 !important;
+  color: #ffffff !important;
+}
 .ccc-favorite-post-toggle > a.save::before {
   /* icomoon Font =========== */
   content: "\f004";
+  color: #ffffff !important;
   /* icomoon Font =========== */
 }
 .ccc-favorite-post-delete > a::before {

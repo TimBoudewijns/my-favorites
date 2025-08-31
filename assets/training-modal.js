@@ -52,13 +52,7 @@ var CCC = CCC || {};
         success: function(response) {
           if (response.success && response.data.training_ids.length > 0) {
             button.addClass('save');
-            // Make heart white when in training
-            button.find('span').attr('style', 'color: #ffffff !important; font-size: 18px !important; line-height: 1 !important;');
             button.attr('title', 'In ' + response.data.training_ids.length + ' training(s)');
-          } else {
-            // Heart red when not in training
-            button.find('span').attr('style', 'color: #dc3545 !important; font-size: 18px !important; line-height: 1 !important;');
-            button.attr('style', button.attr('style') + ' background-color: #ffffff !important; border: 2px solid #dc3545 !important;');
           }
         }
       });
