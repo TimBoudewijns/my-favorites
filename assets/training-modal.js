@@ -391,29 +391,42 @@ var CCC = CCC || {};
       }
       
       var self = this;
+      // Get actual drill data from training system
       $.ajax({
-        url: CCC_MY_FAVORITE_GET.api,
+        url: CCC_MY_TRAINING.api,
         type: 'POST',
         data: {
-          action: CCC_MY_FAVORITE_GET.action,
-          nonce: CCC_MY_FAVORITE_GET.nonce
+          action: CCC_MY_TRAINING.get_action,
+          nonce: CCC_MY_TRAINING.get_nonce
         },
         success: function(response) {
-          console.log('Raw favorite response:', response);
+          console.log('Training data for counter:', response);
+          var count = 0;
           
-          // Get unique drills from training system instead of old favorites
-          var uniqueDrills = new Set();
-          if (response && response.trim()) {
-            var favorites = response.split(',').filter(function(id) {
-              return id && id.trim() !== '';
-            });
-            favorites.forEach(function(id) {
-              uniqueDrills.add(id.trim());
-            });
+          if (response.success && response.data) {
+            // Count unique drills from sessions and unassigned
+            var uniqueDrills = new Set();
+            
+            if (response.data.sessions) {
+              response.data.sessions.forEach(function(session) {
+                if (session.drills) {
+                  session.drills.forEach(function(drillId) {
+                    uniqueDrills.add(drillId.toString());
+                  });
+                }
+              });
+            }
+            
+            if (response.data.unassigned) {
+              response.data.unassigned.forEach(function(drillId) {
+                uniqueDrills.add(drillId.toString());
+              });
+            }
+            
+            count = uniqueDrills.size;
           }
           
-          var count = uniqueDrills.size;
-          console.log('Unique drill count:', count);
+          console.log('Actual unique drill count:', count);
           
           $('.ccc-favorite-post-count .num').text(count);
           if (count > 0) {
