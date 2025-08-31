@@ -129,47 +129,9 @@ class CCC_My_Favorite {
   /*** お気に入りの投稿をユーザーメタ（usermeta）に追加 ***/
   public function usermeta_my_favorite_update() {
     if( check_ajax_referer( $_POST['action'], 'nonce', false ) ) {
-      $user_id = wp_get_current_user()->ID;
-      $post_ids = sanitize_text_field( $_POST['post_ids'] );
-      
-      // Update old favorites system for backward compatibility
-      update_user_meta( $user_id, self::CCC_MY_FAVORITE_POST_IDS, $post_ids );
-      
-      // Update new training system
-      $drills = get_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, true );
-      if( !is_array($drills) ) {
-        $drills = array();
-      }
-      
-      // Convert post_ids to array
-      $new_post_ids = array();
-      if(!empty($post_ids)) {
-        $new_post_ids = explode(',', $post_ids);
-        $new_post_ids = array_filter($new_post_ids, function($id) {
-          return !empty(trim($id));
-        });
-      }
-      
-      // Remove all unassigned drills first
-      $drills = array_filter($drills, function($drill) {
-        return $drill['training_id'] !== 'none';
-      });
-      
-      // Add new unassigned drills
-      foreach($new_post_ids as $post_id) {
-        $post_id = trim($post_id);
-        if(!empty($post_id)) {
-          $drills[] = array(
-            'post_id' => $post_id,
-            'training_id' => 'none',
-            'added' => current_time('mysql'),
-            'updated' => current_time('mysql')
-          );
-        }
-      }
-      
-      update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, $drills );
-      $data = $post_ids;
+      /* 保存された値でメタデータを更新する（もしくはまだそのフィールドが存在しなければ新規作成する）ための関数 */
+      update_user_meta( wp_get_current_user()->ID, self::CCC_MY_FAVORITE_POST_IDS, sanitize_text_field( $_POST['post_ids'] ) );
+      $data = get_user_meta( wp_get_current_user()->ID, self::CCC_MY_FAVORITE_POST_IDS, true );
     } else {
       //status_header( '403' );
       $data = null;
