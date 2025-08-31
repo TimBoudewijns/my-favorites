@@ -40,9 +40,9 @@ var CCC = CCC || {};
         CCC.favorite.count_elm.find(CCC.favorite.num_elm).text(favorite_value_array.length);
         /* お気に入りの投稿の保存数のアイコンを分別 */
         if ( favorite_value_array.length > 0 ) {
-          CCC.favorite.count_elm.addClass(CCC.favorite.active_classname);
+          CCC.favorite.count_elm.css('display', 'inline').addClass(CCC.favorite.active_classname);
         } else {
-          CCC.favorite.count_elm.removeClass(CCC.favorite.active_classname);
+          CCC.favorite.count_elm.css('display', 'none').removeClass(CCC.favorite.active_classname);
         }
         /* お気に入りの投稿のアイコンを分別 */
         // 注意：eachする要素はお気に入り一覧（my_favorite-list.php）側ではajaxで動的に生成するためjQueryオブジェクトの変数は使用できない
@@ -102,9 +102,9 @@ var CCC = CCC || {};
         /* お気に入りの投稿の保存数を更新 */
         CCC.favorite.count_elm.find(CCC.favorite.num_elm).text(favorite_value_array.length);
         if ( favorite_value_array.length > 0 ) {
-          CCC.favorite.count_elm.addClass(CCC.favorite.active_classname);
+          CCC.favorite.count_elm.css('display', 'inline').addClass(CCC.favorite.active_classname);
         } else {
-          CCC.favorite.count_elm.removeClass(CCC.favorite.active_classname);
+          CCC.favorite.count_elm.css('display', 'none').removeClass(CCC.favorite.active_classname);
         }
       }
 
@@ -164,7 +164,7 @@ var CCC = CCC || {};
           my_favorite_update_ajax(''); // お気に入りの投稿をMySQLのユーザーメタ（wp_usermeta）に保存する関数を呼び出し：ユーザーメタの値を削除
         }
         CCC.favorite.count_elm.find(CCC.favorite.num_elm).text(0); // お気に入りの投稿の保存数をクリア
-        CCC.favorite.count_elm.removeClass(CCC.favorite.active_classname); // お気に入りの投稿の保存数のアイコンをクリア
+        CCC.favorite.count_elm.css('display', 'none').removeClass(CCC.favorite.active_classname); // お気に入りの投稿の保存数のアイコンをクリア
         CCC.favorite.toggle_btn_elm.removeClass(CCC.favorite.save_classname); // お気に入りの投稿のアイコンをクリア
       });
 

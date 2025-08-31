@@ -41,7 +41,7 @@ if (! class_exists('CCC_My_Favorite_ShortCode_List')) {
         $style = 1;
       }
 
-      $data = '<span class="ccc-favorite-post-count" data-ccc_my_favorites-menu-style="' . $style . '" style="display: inline !important; vertical-align: baseline !important; margin-left: 6px !important;">
+      $data = '<span class="ccc-favorite-post-count" data-ccc_my_favorites-menu-style="' . $style . '" style="display: none; vertical-align: baseline !important; margin-left: 6px !important;">
         <span class="num" style="
           background-color: #dc3545 !important;
           color: #ffffff !important;

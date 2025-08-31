@@ -505,9 +505,9 @@ var CCC = CCC || {};
           
           $('.ccc-favorite-post-count .num').text(count);
           if (count > 0) {
-            $('.ccc-favorite-post-count').addClass('active');
+            $('.ccc-favorite-post-count').css('display', 'inline').addClass('active');
           } else {
-            $('.ccc-favorite-post-count').removeClass('active');
+            $('.ccc-favorite-post-count').css('display', 'none').removeClass('active');
           }
         }
       });
