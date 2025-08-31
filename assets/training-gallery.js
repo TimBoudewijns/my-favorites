@@ -153,11 +153,13 @@ var CCC = CCC || {};
                 '<img src="' + post.thumbnail + '" alt="' + post.title + '" />' +
                 '</a>' +
                 '<h5 style="font-size: 14px !important; margin: 4px 0 !important; font-weight: 500 !important;"><a href="' + post.permalink + '" style="text-decoration: none !important;">' + post.title + '</a></h5>' +
-                '<div class="ccc-drill-actions">' +
-                '<button class="ccc-remove-from-training" data-post-id="' + post.id + '" data-training-id="' + trainingId + '">Remove</button>';
+                '<div class="ccc-drill-actions">';
                 
               if (trainingId === 'none') {
-                html += '<button class="ccc-assign-to-training" data-post-id="' + post.id + '">Assign</button>';
+                html += '<button class="ccc-assign-to-training" data-post-id="' + post.id + '">Assign to Training</button>';
+                html += '<button class="ccc-remove-from-favorites" data-post-id="' + post.id + '" style="background-color: #6c757d !important; color: white !important; border: none !important; padding: 4px 8px !important; margin-left: 4px !important; border-radius: 3px !important;">Remove from Favorites</button>';
+              } else {
+                html += '<button class="ccc-remove-from-training" data-post-id="' + post.id + '" data-training-id="' + trainingId + '">Remove</button>';
               }
               
               html += '</div></div>';

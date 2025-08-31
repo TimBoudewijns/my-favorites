@@ -30,6 +30,7 @@ var CCC = CCC || {};
       // Gallery events
       $(document).on('click', '.ccc-remove-from-training', this.removeFromTraining.bind(this));
       $(document).on('click', '.ccc-assign-to-training', this.showAssignModal.bind(this));
+      $(document).on('click', '.ccc-remove-from-favorites', this.removeFromFavorites.bind(this));
     },
     
     modifyFavoriteButtons: function() {
@@ -291,6 +292,90 @@ var CCC = CCC || {};
       e.preventDefault();
       this.currentPostId = $(e.currentTarget).data('post-id');
       this.showModal();
+    },
+    
+    removeFromFavorites: function(e) {
+      e.preventDefault();
+      var postId = $(e.currentTarget).data('post-id');
+      
+      if (!confirm('Remove this drill from your favorites completely?')) {
+        return;
+      }
+      
+      var self = this;
+      
+      // For logged-in users, remove from user meta
+      if (CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        $.ajax({
+          url: CCC_MY_FAVORITE_UPDATE.api,
+          type: 'POST',
+          data: {
+            action: CCC_MY_FAVORITE_UPDATE.action,
+            nonce: CCC_MY_FAVORITE_UPDATE.nonce,
+            post_ids: '' // Empty string removes all favorites
+          },
+          success: function(response) {
+            // Get current favorites and remove this post
+            $.ajax({
+              url: CCC_MY_FAVORITE_GET.api,
+              type: 'POST',
+              data: {
+                action: CCC_MY_FAVORITE_GET.action,
+                nonce: CCC_MY_FAVORITE_GET.nonce
+              },
+              success: function(response) {
+                var favorites = response ? response.split(',') : [];
+                var filteredFavorites = favorites.filter(function(id) {
+                  return id != postId;
+                });
+                
+                // Update user meta with filtered favorites
+                $.ajax({
+                  url: CCC_MY_FAVORITE_UPDATE.api,
+                  type: 'POST',
+                  data: {
+                    action: CCC_MY_FAVORITE_UPDATE.action,
+                    nonce: CCC_MY_FAVORITE_UPDATE.nonce,
+                    post_ids: filteredFavorites.join(',')
+                  },
+                  success: function() {
+                    // Reload gallery
+                    if ($('#ccc-training-gallery').length) {
+                      CCC.trainingGallery.loadGallery();
+                    }
+                    
+                    // Update button
+                    var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
+                    button.removeClass('save');
+                  }
+                });
+              }
+            });
+          }
+        });
+      } else {
+        // For non-logged-in users, remove from localStorage
+        var storageKey = 'ccc-my_favorite_post';
+        var favorites = localStorage.getItem(storageKey);
+        if (favorites) {
+          var favArray = favorites.split(',').filter(function(id) {
+            return id != postId;
+          });
+          localStorage.setItem(storageKey, favArray.join(','));
+        }
+        
+        // Reload gallery
+        if ($('#ccc-training-gallery').length) {
+          CCC.trainingGallery.loadGallery();
+        }
+        
+        // Update button
+        var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
+        button.removeClass('save');
+        
+        // Update counter
+        $('.ccc-favorite-post-count .num').text(favArray ? favArray.length : 0);
+      }
     },
     
     closeModal: function() {
