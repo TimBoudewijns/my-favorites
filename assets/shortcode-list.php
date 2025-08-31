@@ -41,36 +41,35 @@ if (! class_exists('CCC_My_Favorite_ShortCode_List')) {
         $style = 1;
       }
 
-      $data = '<div class="ccc-favorite-post-count" data-ccc_my_favorites-menu-style="' . $style . '" style="display: inline-block !important; vertical-align: middle !important;">
+      $data = '<span class="ccc-favorite-post-count" data-ccc_my_favorites-menu-style="' . $style . '" style="display: inline !important; vertical-align: baseline !important;">
         <a href="' . esc_url(home_url()) . '/' . $slug . '/" style="
           display: inline !important;
-          align-items: baseline !important;
           text-decoration: none !important;
-          vertical-align: middle !important;
-        " data-no-icon="true">
-          <span class="text" style="
-            font-size: inherit !important;
-            color: inherit !important;
-            line-height: inherit !important;
-            vertical-align: middle !important;
+          vertical-align: baseline !important;
+          position: relative !important;
+        ">
+          <span style="
+            position: relative !important;
+            z-index: 2 !important;
+            background: inherit !important;
+            padding-right: 4px !important;
           ">' . $text . '</span>
           <span class="num" style="
             background-color: #dc3545 !important;
             color: #ffffff !important;
-            border-radius: 10px !important;
-            min-width: 18px !important;
-            height: 18px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            font-size: 11px !important;
+            border-radius: 8px !important;
+            min-width: 16px !important;
+            height: 16px !important;
+            display: inline-block !important;
+            text-align: center !important;
+            font-size: 10px !important;
             font-weight: bold !important;
-            line-height: 1 !important;
-            margin-left: 6px !important;
-            vertical-align: middle !important;
+            line-height: 16px !important;
+            margin-left: 4px !important;
+            vertical-align: baseline !important;
           "></span>
         </a>
-      </div>'; //<!-- /.ccc-favorite-post-count -->
+      </span>'; //<!-- /.ccc-favorite-post-count -->
       return $data;
     } //endfunction
 

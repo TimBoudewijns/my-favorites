@@ -73,7 +73,7 @@
   content: "\f004";
   /* icomoon Font =========== */
 }
-.ccc-favorite-post-count > a[data-no-icon="true"]::before {
+.ccc-favorite-post-count[data-ccc_my_favorites-menu-style="1"] > a::before {
   display: none !important;
   content: none !important;
 }
