@@ -73,6 +73,10 @@
   content: "\f004";
   /* icomoon Font =========== */
 }
+.ccc-favorite-post-count > a[data-no-icon="true"]::before {
+  display: none !important;
+  content: none !important;
+}
 .ccc-favorite-post-count .num {
   font-size: 0.75em;
   font-weight: bold;
