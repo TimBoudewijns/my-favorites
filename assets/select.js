@@ -50,9 +50,15 @@ var CCC = CCC || {};
           var post_id = $(this).data(CCC.favorite.data_key);
           var value_index = favorite_value_array.indexOf(String(post_id)); // ストレージの値は文字列に変換しているので、indexOfの指定も数値を文字列に変換する必要がある
           if (value_index === -1) {
-            $(this).removeClass(CCC.favorite.save_classname); // お気に入りのローカルストレージの値に投稿IDが無い場合（戻り値：-1）
+            $(this).removeClass(CCC.favorite.save_classname);
+            // Not in favorites - red heart with white background
+            $(this).find('span').attr('style', 'color: #dc3545 !important; font-size: 18px !important; line-height: 1 !important;');
+            $(this).attr('style', $(this).attr('style') + ' background-color: #ffffff !important; border: 2px solid #dc3545 !important;');
           } else {
-            $(this).addClass(CCC.favorite.save_classname); // お気に入りのローカルストレージの値に投稿IDが有る場合（戻り値：0以上）
+            $(this).addClass(CCC.favorite.save_classname);
+            // In favorites - white heart with red background
+            $(this).find('span').attr('style', 'color: #ffffff !important; font-size: 18px !important; line-height: 1 !important;');
+            $(this).attr('style', $(this).attr('style').replace('background-color: #ffffff', 'background-color: #dc3545').replace('border: 2px solid #dc3545', 'border: none') + ' !important;');
           }
         });
       }
@@ -65,6 +71,17 @@ var CCC = CCC || {};
         var post_id = this_elm.data(CCC.favorite.data_key);
         //console.log(post_id);
         this_elm.toggleClass(CCC.favorite.save_classname); // お気に入りの投稿のアイコンを切替
+        
+        // Update button styling based on state
+        if (this_elm.hasClass(CCC.favorite.save_classname)) {
+          // In favorites - white heart with red background
+          this_elm.find('span').attr('style', 'color: #ffffff !important; font-size: 18px !important; line-height: 1 !important;');
+          this_elm.attr('style', this_elm.attr('style').replace('background-color: #ffffff', 'background-color: #dc3545').replace('border: 2px solid #dc3545', 'border: none'));
+        } else {
+          // Not in favorites - red heart with white background  
+          this_elm.find('span').attr('style', 'color: #dc3545 !important; font-size: 18px !important; line-height: 1 !important;');
+          this_elm.attr('style', this_elm.attr('style').replace('background-color: #dc3545', 'background-color: #ffffff') + ' border: 2px solid #dc3545 !important;');
+        }
 
         /* 選択：お気に入りの投稿を切り替え */
         if (favorite_value === null) {
