@@ -41,7 +41,34 @@ if (! class_exists('CCC_My_Favorite_ShortCode_List')) {
         $style = 1;
       }
 
-      $data = '<div class="ccc-favorite-post-count" data-ccc_my_favorites-menu-style="' . $style . '"><a href="' . esc_url(home_url()) . '/' . $slug . '/"><span class="num"></span><span class="text">' . $text . '</span></a></div>'; //<!-- /.ccc-favorite-post-count -->
+      $data = '<div class="ccc-favorite-post-count" data-ccc_my_favorites-menu-style="' . $style . '" style="display: inline-block !important;">
+        <a href="' . esc_url(home_url()) . '/' . $slug . '/" style="
+          display: inline-flex !important;
+          align-items: center !important;
+          gap: 6px !important;
+          text-decoration: none !important;
+          vertical-align: middle !important;
+        ">
+          <span class="num" style="
+            background-color: #dc3545 !important;
+            color: #ffffff !important;
+            border-radius: 50% !important;
+            min-width: 20px !important;
+            height: 20px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            font-size: 12px !important;
+            font-weight: bold !important;
+            line-height: 1 !important;
+          "></span>
+          <span class="text" style="
+            font-size: 14px !important;
+            color: inherit !important;
+            line-height: 1 !important;
+          ">' . $text . '</span>
+        </a>
+      </div>'; //<!-- /.ccc-favorite-post-count -->
       return $data;
     } //endfunction
 
