@@ -112,7 +112,7 @@ var CCC = CCC || {};
       
       if (currentTrainings.length > 0) {
         modalHtml += '<div class="ccc-current-trainings">' +
-          '<h3>Currently in:</h3>' +
+          '<h3 style="font-size: 16px !important; margin: 0 0 8px 0 !important; font-weight: 600 !important; color: #333 !important;">Currently in:</h3>' +
           '<ul>';
         currentTrainings.forEach(function(training) {
           modalHtml += '<li>' + training.name + ' (' + training.date + ')' +

@@ -300,18 +300,17 @@ class CCC_My_Favorite {
         $drills = array();
       }
       
-      // Check if drill already exists and update or add new
-      $found = false;
-      foreach($drills as &$drill) {
-        if($drill['post_id'] == $post_id) {
-          $drill['training_id'] = $training_id;
-          $drill['updated'] = current_time('mysql');
-          $found = true;
+      // Check if this drill-training combination already exists
+      $exists = false;
+      foreach($drills as $drill) {
+        if($drill['post_id'] == $post_id && $drill['training_id'] == $training_id) {
+          $exists = true;
           break;
         }
       }
       
-      if(!$found) {
+      // Only add if this combination doesn't exist yet
+      if(!$exists) {
         $drills[] = array(
           'post_id' => $post_id,
           'training_id' => $training_id,
