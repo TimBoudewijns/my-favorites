@@ -399,13 +399,21 @@ var CCC = CCC || {};
           nonce: CCC_MY_FAVORITE_GET.nonce
         },
         success: function(response) {
-          var count = 0;
+          console.log('Raw favorite response:', response);
+          
+          // Get unique drills from training system instead of old favorites
+          var uniqueDrills = new Set();
           if (response && response.trim()) {
             var favorites = response.split(',').filter(function(id) {
               return id && id.trim() !== '';
             });
-            count = favorites.length;
+            favorites.forEach(function(id) {
+              uniqueDrills.add(id.trim());
+            });
           }
+          
+          var count = uniqueDrills.size;
+          console.log('Unique drill count:', count);
           
           $('.ccc-favorite-post-count .num').text(count);
           if (count > 0) {
