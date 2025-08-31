@@ -38,7 +38,18 @@ var CCC = CCC || {};
       // Check which trainings this drill is already in
       $('.ccc-favorite-post-toggle-button').each(function() {
         var postId = $(this).data('post_id-ccc_favorite');
-        CCC.trainingModal.checkDrillStatus(postId, $(this));
+        var button = $(this);
+        
+        // For non-logged-in users, also check if drill is in favorites
+        if (!CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+          var favorites = localStorage.getItem('ccc-my_favorite_post') || '';
+          var favArray = favorites.split(',').filter(function(id) { return id; });
+          if (favArray.indexOf(postId.toString()) !== -1) {
+            button.addClass('save');
+          }
+        }
+        
+        CCC.trainingModal.checkDrillStatus(postId, button);
       });
     },
     
@@ -419,22 +430,41 @@ var CCC = CCC || {};
       } else {
         // For non-logged-in users, use localStorage
         var drills = JSON.parse(localStorage.getItem('ccc-training-drills') || '[]');
+        var sessions = JSON.parse(localStorage.getItem('ccc-training-sessions') || '[]');
         
-        // Find and mark as unassigned
-        drills = drills.map(function(drill) {
-          if (drill.post_id == postId && drill.training_id == trainingId) {
-            drill.training_id = 'none';
-          }
-          return drill;
+        // Remove drill from training (not mark as unassigned, actually remove the entry)
+        drills = drills.filter(function(drill) {
+          return !(drill.post_id == postId && drill.training_id == trainingId);
         });
         
         localStorage.setItem('ccc-training-drills', JSON.stringify(drills));
+        
+        // Update session drill count and array
+        sessions = sessions.map(function(session) {
+          if (session.id === trainingId) {
+            session.drills = session.drills || [];
+            var index = session.drills.indexOf(postId.toString());
+            if (index > -1) {
+              session.drills.splice(index, 1);
+            }
+            session.drill_count = session.drills.length;
+          }
+          return session;
+        });
+        localStorage.setItem('ccc-training-sessions', JSON.stringify(sessions));
         
         // Update UI
         if (self.modal) {
           self.closeModal();
           self.showModal(); // Refresh modal
         }
+        
+        // Update button status
+        var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
+        self.checkDrillStatus(postId, button);
+        
+        // Update counter
+        self.updateCounter();
         
         // Reload gallery
         if ($('#ccc-training-gallery').length) {
@@ -512,7 +542,7 @@ var CCC = CCC || {};
           }
         });
       } else {
-        // For non-logged-in users, remove from localStorage
+        // For non-logged-in users, remove from localStorage completely
         var storageKey = 'ccc-my_favorite_post';
         var favorites = localStorage.getItem(storageKey);
         if (favorites) {
@@ -521,6 +551,27 @@ var CCC = CCC || {};
           });
           localStorage.setItem(storageKey, favArray.join(','));
         }
+        
+        // Also remove from all training assignments
+        var drills = JSON.parse(localStorage.getItem('ccc-training-drills') || '[]');
+        drills = drills.filter(function(drill) {
+          return drill.post_id != postId;
+        });
+        localStorage.setItem('ccc-training-drills', JSON.stringify(drills));
+        
+        // Update all sessions to remove this drill
+        var sessions = JSON.parse(localStorage.getItem('ccc-training-sessions') || '[]');
+        sessions = sessions.map(function(session) {
+          if (session.drills) {
+            var index = session.drills.indexOf(postId.toString());
+            if (index > -1) {
+              session.drills.splice(index, 1);
+              session.drill_count = session.drills.length;
+            }
+          }
+          return session;
+        });
+        localStorage.setItem('ccc-training-sessions', JSON.stringify(sessions));
         
         // Reload gallery
         if ($('#ccc-training-gallery').length) {
@@ -531,8 +582,8 @@ var CCC = CCC || {};
         var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
         button.removeClass('save');
         
-        // Update counter
-        $('.ccc-favorite-post-count .num').text(favArray ? favArray.length : 0);
+        // Update counter properly
+        self.updateCounter();
       }
     },
     
