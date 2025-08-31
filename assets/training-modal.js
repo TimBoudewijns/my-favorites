@@ -43,21 +43,38 @@ var CCC = CCC || {};
     },
     
     checkDrillStatus: function(postId, button) {
-      $.ajax({
-        url: CCC_MY_TRAINING.api,
-        type: 'POST',
-        data: {
-          action: 'ccc_get_drill_trainings',
-          nonce: CCC_MY_TRAINING.get_drill_nonce,
-          post_id: postId
-        },
-        success: function(response) {
-          if (response.success && response.data.training_ids.length > 0) {
-            button.addClass('save');
-            button.attr('title', 'In ' + response.data.training_ids.length + ' training(s)');
+      if (CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        $.ajax({
+          url: CCC_MY_TRAINING.api,
+          type: 'POST',
+          data: {
+            action: 'ccc_get_drill_trainings',
+            nonce: CCC_MY_TRAINING.get_drill_nonce,
+            post_id: postId
+          },
+          success: function(response) {
+            if (response.success && response.data.training_ids.length > 0) {
+              button.addClass('save');
+              button.attr('title', 'In ' + response.data.training_ids.length + ' training(s)');
+            }
           }
+        });
+      } else {
+        // For non-logged-in users, check localStorage
+        var drills = JSON.parse(localStorage.getItem('ccc-training-drills') || '[]');
+        var trainingCount = 0;
+        
+        drills.forEach(function(drill) {
+          if (drill.post_id == postId && drill.training_id !== 'none') {
+            trainingCount++;
+          }
+        });
+        
+        if (trainingCount > 0) {
+          button.addClass('save');
+          button.attr('title', 'In ' + trainingCount + ' training(s)');
         }
-      });
+      }
     },
     
     handleFavoriteClick: function(e) {
@@ -125,8 +142,9 @@ var CCC = CCC || {};
       
       // Check current assignments
       var currentTrainings = [];
+      var postIdStr = CCC.trainingModal.currentPostId.toString();
       sessions.forEach(function(session) {
-        if (session.drills && session.drills.indexOf(CCC.trainingModal.currentPostId) !== -1) {
+        if (session.drills && (session.drills.indexOf(postIdStr) !== -1 || session.drills.indexOf(parseInt(postIdStr)) !== -1)) {
           currentTrainings.push(session);
         }
       });
@@ -153,7 +171,8 @@ var CCC = CCC || {};
             '<h4>' + session.name + '</h4>' +
             '<p class="ccc-training-date">' + session.date + '</p>' +
             '<p class="ccc-drill-count">' + session.drill_count + ' drills</p>' +
-            '<button class="ccc-select-training" data-training-id="' + session.id + '">' +
+            '<button class="ccc-select-training" data-training-id="' + session.id + '"' + 
+            (isSelected ? ' disabled style="opacity: 0.5; cursor: not-allowed;"' : '') + '>' +
             (isSelected ? 'Already Added' : 'Add to This') +
             '</button>' +
             '</div>';
