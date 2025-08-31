@@ -56,18 +56,6 @@ if (! class_exists('CCC_My_Favorite')) {
   /*** Instantiate ****/
   ccc_my_favorite_initialize();
 
-  /*** Migration on activation ***/
-  register_activation_hook(__FILE__, function() {
-    // Ensure the class is available
-    if (!class_exists('CCC_My_Favorite')) {
-      require_once(CCCMYFAVORITE_PLUGIN_PATH . '/function.php');
-    }
-    
-    // Create temporary instance for migration
-    $migration_instance = new CCC_My_Favorite();
-    $migration_instance->migrate_existing_favorites();
-  });
-
   /*** How to use this Shortcode ***/
   /*
   * [ccc_my_favorite_select_button post_id="int" text="string" style="string"] - Shows modal to assign drill to training

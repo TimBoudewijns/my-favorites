@@ -39,9 +39,6 @@ class CCC_My_Favorite {
     add_action( 'wp_ajax_nopriv_get_posts_by_ids', array( $this, 'get_posts_by_ids') );
     add_action( 'wp_ajax_nopriv_ccc_my_training-get-action', array( $this, 'get_training_sessions') );
     add_action( 'wp_ajax_nopriv_ccc_get_drill_trainings', array( $this, 'get_drill_trainings') );
-    
-    // Run migration check on admin_init
-    add_action( 'admin_init', array( $this, 'check_migration' ) );
   } //endfunction
 
   public function jquery_check() {
@@ -144,29 +141,14 @@ class CCC_My_Favorite {
   /*** ユーザーメタに保存されたお気に入りの投稿を取得 ***/
   public function usermeta_my_favorite_get() {
     if( check_ajax_referer( $_POST['action'], 'nonce', false ) ) {
-      $user_id = wp_get_current_user()->ID;
-      
-      // Get drills from new training system
-      $drills = get_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, true );
-      if( !is_array($drills) ) {
-        $drills = array();
-      }
-      
-      // Create comma-separated list of all drill post IDs for backward compatibility
-      $drill_ids = array();
-      foreach($drills as $drill) {
-        if(!in_array($drill['post_id'], $drill_ids)) {
-          $drill_ids[] = $drill['post_id'];
-        }
-      }
-      
-      $data = implode(',', $drill_ids);
+      $data = get_user_meta( wp_get_current_user()->ID, self::CCC_MY_FAVORITE_POST_IDS, true );
     } else {
       //status_header( '403' );
       $data = null;
     }
     echo $data;
-    die();
+    /* スクリプト終了時のメッセージを削除（注意：admin-ajax.phpの仕様でwp_die('0');があるためレスポンスの値に「0」が含まれる）*/
+    die(); //メッセージは無しで現在のスクリプトを終了する（メッセージは空にする）
   } //endfunction
 
   public function list_styles() {
@@ -227,25 +209,10 @@ class CCC_My_Favorite {
   
   /*** Get all training sessions with drills ***/
   public function get_training_sessions() {
-    // For non-logged-in users, return empty so JavaScript uses localStorage
-    if (!is_user_logged_in()) {
-      wp_send_json_success( array(
-        'sessions' => array(),
-        'unassigned' => array()
-      ) );
-      die();
-    }
-    
-    // For logged-in users, check nonce and get from database
     if( check_ajax_referer( $_POST['action'], 'nonce', false ) ) {
       $user_id = wp_get_current_user()->ID;
-    } else {
-      wp_send_json_error( 'Forbidden' );
-      die();
-    }
-    
-    $sessions = get_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, true );
-    $drills = get_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, true );
+      $sessions = get_user_meta( $user_id, self::CCC_MY_TRAINING_SESSIONS, true );
+      $drills = get_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, true );
     
     if( !is_array($sessions) ) {
       $sessions = array();
@@ -275,10 +242,13 @@ class CCC_My_Favorite {
       }
     }
     
-    wp_send_json_success( array(
-      'sessions' => $sessions,
-      'unassigned' => $unassigned
-    ) );
+      wp_send_json_success( array(
+        'sessions' => $sessions,
+        'unassigned' => $unassigned
+      ) );
+    } else {
+      wp_send_json_error( 'Forbidden' );
+    }
     die();
   }
   
@@ -513,72 +483,5 @@ class CCC_My_Favorite {
     die();
   }
 
-  public function migrate_existing_favorites() {
-    // Check if migration has already been done
-    if (get_option('ccc_favorites_migrated')) {
-      error_log('CCC Migration: Already completed, skipping');
-      return;
-    }
-    
-    error_log('CCC Migration: Starting migration of existing favorites');
-    
-    // Get all users
-    $users = get_users();
-    $migrated_count = 0;
-    
-    foreach ($users as $user) {
-      $user_id = $user->ID;
-      
-      // Get existing favorites
-      $favorites = get_user_meta( $user_id, self::CCC_MY_FAVORITE_POST_IDS, true );
-      
-      if (!empty($favorites)) {
-        error_log('CCC Migration: Found favorites for user ' . $user_id . ': ' . $favorites);
-        
-        // Convert to array
-        $favorite_ids = explode(',', $favorites);
-        $favorite_ids = array_filter($favorite_ids, function($id) {
-          return !empty(trim($id));
-        });
-        
-        // Get existing drills - start fresh for migration
-        $existing_drills = array();
-        
-        // Convert all favorites to unassigned drills
-        foreach ($favorite_ids as $post_id) {
-          $post_id = trim($post_id);
-          if (empty($post_id)) continue;
-          
-          $existing_drills[] = array(
-            'post_id' => $post_id,
-            'training_id' => 'none', // Mark as unassigned
-            'added' => current_time('mysql'),
-            'updated' => current_time('mysql')
-          );
-          $migrated_count++;
-          error_log('CCC Migration: Migrated post ' . $post_id . ' for user ' . $user_id);
-        }
-        
-        // Save updated drills
-        update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, $existing_drills );
-      }
-    }
-    
-    // Mark migration as completed
-    update_option('ccc_favorites_migrated', true);
-    error_log('CCC Migration: Completed. Migrated ' . $migrated_count . ' favorites');
-  }
-
-  public function check_migration() {
-    // Reset for testing - remove this after testing
-    delete_option('ccc_favorites_migrated');
-    delete_transient('ccc_migration_checked');
-    
-    // Only run once per admin session
-    if (!get_transient('ccc_migration_checked')) {
-      $this->migrate_existing_favorites();
-      set_transient('ccc_migration_checked', true, 3600); // Check once per hour
-    }
-  }
 
 } //endclass
