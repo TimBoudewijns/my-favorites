@@ -37,6 +37,8 @@ class CCC_My_Favorite {
     add_action( 'wp_ajax_ccc_remove_drill_from_training', array( $this, 'remove_drill_from_training') );
     add_action( 'wp_ajax_get_posts_by_ids', array( $this, 'get_posts_by_ids') );
     add_action( 'wp_ajax_nopriv_get_posts_by_ids', array( $this, 'get_posts_by_ids') );
+    add_action( 'wp_ajax_nopriv_ccc_my_training-get-action', array( $this, 'get_training_sessions') );
+    add_action( 'wp_ajax_nopriv_ccc_get_drill_trainings', array( $this, 'get_drill_trainings') );
   } //endfunction
 
   public function jquery_check() {
@@ -76,9 +78,9 @@ class CCC_My_Favorite {
   } //endfunction
   
   public function training_scripts() {
-    // Enqueue modal script
+    // Enqueue modal script (handles login check internally)
     $modal_handle = 'ccc_my_training-modal';
-    wp_register_script( $modal_handle, CCCMYFAVORITE_PLUGIN_URL.'/assets/training-modal.js', array( 'jquery' ), CCCMYFAVORITE_PLUGIN_VERSION, true );
+    wp_register_script( $modal_handle, CCCMYFAVORITE_PLUGIN_URL.'/assets/training-modal.js', array( 'jquery', 'ccc_my_favorite-select' ), CCCMYFAVORITE_PLUGIN_VERSION, true );
     wp_enqueue_script( $modal_handle );
     
     // Enqueue gallery script
@@ -98,7 +100,7 @@ class CCC_My_Favorite {
         'delete_nonce' => wp_create_nonce( 'ccc_my_training-delete-action' ),
         'add_drill_nonce' => wp_create_nonce( 'ccc_add_drill_to_training' ),
         'get_drill_nonce' => wp_create_nonce( 'ccc_get_drill_trainings' ),
-        'remove_drill_nonce' => wp_create_nonce( 'ccc_remove_drill_from_training' )
+        'remove_drill_nonce' => wp_create_nonce( 'ccc_remove_drill_from_training' ),\n        'get_posts_nonce' => wp_create_nonce( 'get_posts_by_ids' )
       )
     );
     
@@ -114,7 +116,7 @@ class CCC_My_Favorite {
         'delete_nonce' => wp_create_nonce( 'ccc_my_training-delete-action' ),
         'add_drill_nonce' => wp_create_nonce( 'ccc_add_drill_to_training' ),
         'get_drill_nonce' => wp_create_nonce( 'ccc_get_drill_trainings' ),
-        'remove_drill_nonce' => wp_create_nonce( 'ccc_remove_drill_from_training' )
+        'remove_drill_nonce' => wp_create_nonce( 'ccc_remove_drill_from_training' ),\n        'get_posts_nonce' => wp_create_nonce( 'get_posts_by_ids' )
       )
     );
   } //endfunction

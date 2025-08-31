@@ -94,7 +94,7 @@ var CCC = CCC || {};
         if( favorite_value_array.length > 300 ) {
           favorite_value_array = favorite_value_array.slice( 0, 300 ); /* 開始位置と終了位置を指定（開始位置は0から数えて終了位置の値は含まない） */
         }
-        favorite_value_array_str = favorite_value_array.join(','); // 配列要素の連結・結合：配列を連結して1つの文字列に変換
+        var favorite_value_array_str = favorite_value_array.join(','); // 配列要素の連結・結合：配列を連結して1つの文字列に変換
         /* ログインユーザーでは無い場合 */
         if( CCC_MY_FAVORITE_UPDATE.user_logged_in == false ) {
           localStorage.setItem(favorite_key, favorite_value_array_str); // 指定したキーのローカルストレージにお気に入りの投稿の文字列データを保存

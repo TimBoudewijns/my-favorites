@@ -76,6 +76,15 @@ if( ! class_exists( 'CCC_My_Training_ShortCode' ) ) {
     }
     
     public static function training_gallery($atts) {
+      // Enqueue required styles and scripts
+      wp_enqueue_style('ccc_my_training-modern');
+      wp_enqueue_script('ccc_my_training-gallery');
+      
+      // Also enqueue modal for logged-in users
+      if (is_user_logged_in()) {
+        wp_enqueue_script('ccc_my_training-modal');
+      }
+      
       $atts = shortcode_atts(array(
         "title" => 'My Training Sessions',
         "show_search" => 'true',

@@ -17,7 +17,7 @@ var CCC = CCC || {};
     },
     
     bindEvents: function() {
-      // Override default favorite button behavior
+      // Handle favorite button clicks (works alongside select.js for logged-in users)
       $(document).on('click', '.ccc-favorite-post-toggle-button', this.handleFavoriteClick.bind(this));
       
       // Modal events
@@ -59,12 +59,14 @@ var CCC = CCC || {};
     },
     
     handleFavoriteClick: function(e) {
-      e.preventDefault();
-      
+      // Only handle if user is logged in, otherwise let select.js handle it
       if (!CCC_MY_FAVORITE_UPDATE.user_logged_in) {
-        alert('Please log in to manage training sessions.');
+        // Don't prevent default - let the original handler work
         return;
       }
+      
+      e.preventDefault();
+      e.stopImmediatePropagation(); // Stop other handlers from executing
       
       this.currentPostId = $(e.currentTarget).data('post_id-ccc_favorite');
       this.showModal();
@@ -245,8 +247,8 @@ var CCC = CCC || {};
       if (typeof postId === 'object') {
         var e = postId;
         e.preventDefault();
-        postId = $(e.currentTarget).data('post-id');
-        trainingId = $(e.currentTarget).data('training-id');
+        var postId = $(e.currentTarget).data('post-id');
+        var trainingId = $(e.currentTarget).data('training-id');
       }
       
       var self = this;

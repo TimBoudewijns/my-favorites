@@ -88,7 +88,7 @@ var CCC = CCC || {};
       );
     } //endif
     my_promise.done( function() {
-      found_posts_count_val = $('.ccc-favorite-post-count').find('.num').text();
+      var found_posts_count_val = $('.ccc-favorite-post-count').find('.num').text();
       $('#'+ count_post).children('.found_posts').text(found_posts_count_val);
       var list_post_num = $('.'+ list_post).filter(':visible').length;
       $('#'+ count_post).children('.number').text(list_post_num);

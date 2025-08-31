@@ -35,7 +35,10 @@ load_plugin_textdomain(CCCMYFAVORITE_TEXT_DOMAIN, false, basename(dirname(__FILE
 /*** Require PHP Version Check ***/
 if (version_compare(phpversion(), $this_plugin_info['minimum_php'], '<')) {
   $plugin_notice = sprintf(__('Oops, this plugin will soon require PHP %s or higher.', CCCMYFAVORITE_TEXT_DOMAIN), $this_plugin_info['minimum_php']);
-  register_activation_hook(__FILE__, create_function('', "deactivate_plugins('" . plugin_basename(__FILE__) . "'); wp_die('{$plugin_notice}');"));
+  register_activation_hook(__FILE__, function() use ($plugin_notice) {
+    deactivate_plugins(plugin_basename(__FILE__));
+    wp_die($plugin_notice);
+  });
 }
 
 if (! class_exists('CCC_My_Favorite')) {

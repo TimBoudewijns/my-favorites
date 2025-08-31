@@ -134,7 +134,7 @@ var CCC = CCC || {};
         data: {
           action: 'get_posts_by_ids',
           post_ids: drillIds.join(','),
-          nonce: CCC_MY_TRAINING.get_nonce
+          nonce: CCC_MY_TRAINING.get_posts_nonce
         },
         success: function(response) {
           if (response.success && response.data) {
