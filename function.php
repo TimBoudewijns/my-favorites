@@ -483,4 +483,66 @@ class CCC_My_Favorite {
     die();
   }
 
+  public function migrate_existing_favorites() {
+    // Check if migration has already been done
+    if (get_option('ccc_favorites_migrated')) {
+      return;
+    }
+    
+    // Get all users
+    $users = get_users();
+    
+    foreach ($users as $user) {
+      $user_id = $user->ID;
+      
+      // Get existing favorites
+      $favorites = get_user_meta( $user_id, self::CCC_MY_FAVORITE_POST_IDS, true );
+      
+      if (!empty($favorites)) {
+        // Convert to array
+        $favorite_ids = explode(',', $favorites);
+        $favorite_ids = array_filter($favorite_ids, function($id) {
+          return !empty(trim($id));
+        });
+        
+        // Get existing drills to avoid duplicates
+        $existing_drills = get_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, true );
+        if (empty($existing_drills)) {
+          $existing_drills = array();
+        }
+        
+        // Add each favorite as an unassigned drill if not already exists
+        foreach ($favorite_ids as $post_id) {
+          $post_id = trim($post_id);
+          if (empty($post_id)) continue;
+          
+          // Check if this drill already exists
+          $exists = false;
+          foreach($existing_drills as $drill) {
+            if($drill['post_id'] == $post_id) {
+              $exists = true;
+              break;
+            }
+          }
+          
+          // Only add if this drill doesn't exist yet
+          if(!$exists) {
+            $existing_drills[] = array(
+              'post_id' => $post_id,
+              'training_id' => 'none', // Mark as unassigned
+              'added' => current_time('mysql'),
+              'updated' => current_time('mysql')
+            );
+          }
+        }
+        
+        // Save updated drills
+        update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, $existing_drills );
+      }
+    }
+    
+    // Mark migration as completed
+    update_option('ccc_favorites_migrated', true);
+  }
+
 } //endclass
