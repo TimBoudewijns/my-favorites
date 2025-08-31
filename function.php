@@ -39,6 +39,9 @@ class CCC_My_Favorite {
     add_action( 'wp_ajax_nopriv_get_posts_by_ids', array( $this, 'get_posts_by_ids') );
     add_action( 'wp_ajax_nopriv_ccc_my_training-get-action', array( $this, 'get_training_sessions') );
     add_action( 'wp_ajax_nopriv_ccc_get_drill_trainings', array( $this, 'get_drill_trainings') );
+    
+    // Run migration check on admin_init
+    add_action( 'admin_init', array( $this, 'check_migration' ) );
   } //endfunction
 
   public function jquery_check() {
@@ -484,13 +487,20 @@ class CCC_My_Favorite {
   }
 
   public function migrate_existing_favorites() {
+    // Reset migration flag for testing - remove this line after testing
+    delete_option('ccc_favorites_migrated');
+    
     // Check if migration has already been done
     if (get_option('ccc_favorites_migrated')) {
+      error_log('CCC Migration: Already completed, skipping');
       return;
     }
     
+    error_log('CCC Migration: Starting migration of existing favorites');
+    
     // Get all users
     $users = get_users();
+    $migrated_count = 0;
     
     foreach ($users as $user) {
       $user_id = $user->ID;
@@ -499,6 +509,8 @@ class CCC_My_Favorite {
       $favorites = get_user_meta( $user_id, self::CCC_MY_FAVORITE_POST_IDS, true );
       
       if (!empty($favorites)) {
+        error_log('CCC Migration: Found favorites for user ' . $user_id . ': ' . $favorites);
+        
         // Convert to array
         $favorite_ids = explode(',', $favorites);
         $favorite_ids = array_filter($favorite_ids, function($id) {
@@ -533,6 +545,8 @@ class CCC_My_Favorite {
               'added' => current_time('mysql'),
               'updated' => current_time('mysql')
             );
+            $migrated_count++;
+            error_log('CCC Migration: Migrated post ' . $post_id . ' for user ' . $user_id);
           }
         }
         
@@ -543,6 +557,15 @@ class CCC_My_Favorite {
     
     // Mark migration as completed
     update_option('ccc_favorites_migrated', true);
+    error_log('CCC Migration: Completed. Migrated ' . $migrated_count . ' favorites');
+  }
+
+  public function check_migration() {
+    // Only run once per admin session
+    if (!get_transient('ccc_migration_checked')) {
+      $this->migrate_existing_favorites();
+      set_transient('ccc_migration_checked', true, 3600); // Check once per hour
+    }
   }
 
 } //endclass
