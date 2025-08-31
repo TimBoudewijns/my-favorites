@@ -404,29 +404,25 @@ var CCC = CCC || {};
           var count = 0;
           
           if (response.success && response.data) {
-            // Count unique drills from sessions and unassigned
-            var uniqueDrills = new Set();
+            // Count total drill assignments (drill can be counted multiple times)
+            var totalAssignments = 0;
             
             if (response.data.sessions) {
               response.data.sessions.forEach(function(session) {
                 if (session.drills) {
-                  session.drills.forEach(function(drillId) {
-                    uniqueDrills.add(drillId.toString());
-                  });
+                  totalAssignments += session.drills.length;
                 }
               });
             }
             
             if (response.data.unassigned) {
-              response.data.unassigned.forEach(function(drillId) {
-                uniqueDrills.add(drillId.toString());
-              });
+              totalAssignments += response.data.unassigned.length;
             }
             
-            count = uniqueDrills.size;
+            count = totalAssignments;
           }
           
-          console.log('Actual unique drill count:', count);
+          console.log('Total drill assignments count:', count);
           
           $('.ccc-favorite-post-count .num').text(count);
           if (count > 0) {
