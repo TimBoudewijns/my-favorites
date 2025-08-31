@@ -384,14 +384,22 @@ class CCC_My_Favorite {
       $drills = get_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, true );
       
       if( is_array($drills) ) {
-        foreach($drills as $key => &$drill) {
-          if($drill['post_id'] == $post_id && $drill['training_id'] == $training_id) {
-            $drill['training_id'] = 'none'; // Mark as unassigned instead of deleting
-            break;
+        if($training_id === 'all') {
+          // Remove all instances of this drill completely
+          $drills = array_filter($drills, function($drill) use ($post_id) {
+            return $drill['post_id'] != $post_id;
+          });
+        } else {
+          // Remove from specific training or mark as unassigned
+          foreach($drills as $key => &$drill) {
+            if($drill['post_id'] == $post_id && $drill['training_id'] == $training_id) {
+              $drill['training_id'] = 'none'; // Mark as unassigned instead of deleting
+              break;
+            }
           }
         }
         
-        update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, $drills );
+        update_user_meta( $user_id, self::CCC_MY_TRAINING_DRILLS, array_values($drills) );
       }
       
       wp_send_json_success();

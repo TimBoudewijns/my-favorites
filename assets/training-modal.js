@@ -311,18 +311,20 @@ var CCC = CCC || {};
       
       var self = this;
       
-      // For logged-in users, remove from user meta
+      // For logged-in users, remove from training system
       if (CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        // First remove from all training assignments
         $.ajax({
-          url: CCC_MY_FAVORITE_UPDATE.api,
+          url: CCC_MY_TRAINING.api,
           type: 'POST',
           data: {
-            action: CCC_MY_FAVORITE_UPDATE.action,
-            nonce: CCC_MY_FAVORITE_UPDATE.nonce,
-            post_ids: '' // Empty string removes all favorites
+            action: 'ccc_remove_drill_from_training',
+            nonce: CCC_MY_TRAINING.remove_drill_nonce,
+            post_id: postId,
+            training_id: 'all' // Special flag to remove from all trainings
           },
           success: function(response) {
-            // Get current favorites and remove this post
+            // Then remove from old favorites list
             $.ajax({
               url: CCC_MY_FAVORITE_GET.api,
               type: 'POST',
@@ -351,9 +353,10 @@ var CCC = CCC || {};
                       CCC.trainingGallery.loadGallery();
                     }
                     
-                    // Update button
+                    // Update button and counter
                     var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
                     button.removeClass('save');
+                    self.updateCounter();
                   }
                 });
               }
