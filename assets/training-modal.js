@@ -61,12 +61,6 @@ var CCC = CCC || {};
     },
     
     handleFavoriteClick: function(e) {
-      // Only handle if user is logged in, otherwise let select.js handle it
-      if (!CCC_MY_FAVORITE_UPDATE.user_logged_in) {
-        // Don't prevent default - let the original handler work
-        return;
-      }
-      
       e.preventDefault();
       e.stopImmediatePropagation(); // Stop other handlers from executing
       
@@ -77,20 +71,45 @@ var CCC = CCC || {};
     showModal: function() {
       var self = this;
       
-      // Load training sessions
-      $.ajax({
-        url: CCC_MY_TRAINING.api,
-        type: 'POST',
-        data: {
-          action: CCC_MY_TRAINING.get_action,
-          nonce: CCC_MY_TRAINING.get_nonce
-        },
-        success: function(response) {
-          if (response.success) {
-            self.createModal(response.data);
+      if (CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        // For logged-in users, get data from database
+        $.ajax({
+          url: CCC_MY_TRAINING.api,
+          type: 'POST',
+          data: {
+            action: CCC_MY_TRAINING.get_action,
+            nonce: CCC_MY_TRAINING.get_nonce
+          },
+          success: function(response) {
+            if (response.success) {
+              self.createModal(response.data);
+            }
           }
-        }
-      });
+        });
+      } else {
+        // For non-logged-in users, get data from localStorage
+        var sessions = JSON.parse(localStorage.getItem('ccc-training-sessions') || '[]');
+        var drills = JSON.parse(localStorage.getItem('ccc-training-drills') || '[]');
+        var favorites = localStorage.getItem('ccc-my_favorite_post') || '';
+        var unassigned = favorites.split(',').filter(function(id) { return id; });
+        
+        // Filter unassigned drills (those not in any training)
+        var assignedDrills = [];
+        drills.forEach(function(drill) {
+          if (drill.training_id !== 'none') {
+            assignedDrills.push(drill.post_id.toString());
+          }
+        });
+        
+        unassigned = unassigned.filter(function(id) {
+          return assignedDrills.indexOf(id) === -1;
+        });
+        
+        self.createModal({
+          sessions: sessions,
+          unassigned: unassigned
+        });
+      }
     },
     
     createModal: function(data) {
@@ -197,54 +216,111 @@ var CCC = CCC || {};
       
       var self = this;
       
-      $.ajax({
-        url: CCC_MY_TRAINING.api,
-        type: 'POST',
-        data: {
-          action: CCC_MY_TRAINING.save_action,
-          nonce: CCC_MY_TRAINING.save_nonce,
-          session_name: name,
-          session_date: date
-        },
-        success: function(response) {
-          if (response.success) {
-            // Add drill to new training
-            self.addToTraining(self.currentPostId, response.data.id);
+      if (CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        $.ajax({
+          url: CCC_MY_TRAINING.api,
+          type: 'POST',
+          data: {
+            action: CCC_MY_TRAINING.save_action,
+            nonce: CCC_MY_TRAINING.save_nonce,
+            session_name: name,
+            session_date: date
+          },
+          success: function(response) {
+            if (response.success) {
+              // Add drill to new training
+              self.addToTraining(self.currentPostId, response.data.id);
+            }
           }
-        }
-      });
+        });
+      } else {
+        // For non-logged-in users, save to localStorage
+        var sessions = JSON.parse(localStorage.getItem('ccc-training-sessions') || '[]');
+        var newId = 'training_' + Date.now();
+        
+        sessions.push({
+          id: newId,
+          name: name,
+          date: date,
+          drill_count: 0,
+          drills: []
+        });
+        
+        localStorage.setItem('ccc-training-sessions', JSON.stringify(sessions));
+        
+        // Add drill to new training
+        self.addToTraining(self.currentPostId, newId);
+      }
     },
     
     addToTraining: function(postId, trainingId) {
       var self = this;
       
-      $.ajax({
-        url: CCC_MY_TRAINING.api,
-        type: 'POST',
-        data: {
-          action: 'ccc_add_drill_to_training',
-          nonce: CCC_MY_TRAINING.add_drill_nonce,
-          post_id: postId,
-          training_id: trainingId
-        },
-        success: function(response) {
-          if (response.success) {
-            self.closeModal();
-            // Update button
-            var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
-            button.addClass('save');
-            self.checkDrillStatus(postId, button);
-            
-            // Reload if on gallery page
-            if ($('#ccc-training-gallery').length) {
-              CCC.trainingGallery.loadGallery();
+      if (CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        $.ajax({
+          url: CCC_MY_TRAINING.api,
+          type: 'POST',
+          data: {
+            action: 'ccc_add_drill_to_training',
+            nonce: CCC_MY_TRAINING.add_drill_nonce,
+            post_id: postId,
+            training_id: trainingId
+          },
+          success: function(response) {
+            if (response.success) {
+              self.closeModal();
+              // Update button
+              var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
+              button.addClass('save');
+              self.checkDrillStatus(postId, button);
+              
+              // Reload if on gallery page
+              if ($('#ccc-training-gallery').length) {
+                CCC.trainingGallery.loadGallery();
+              }
+              
+              // Update counter
+              self.updateCounter();
             }
-            
-            // Update counter
-            self.updateCounter();
           }
+        });
+      } else {
+        // For non-logged-in users, save to localStorage
+        var drills = JSON.parse(localStorage.getItem('ccc-training-drills') || '[]');
+        
+        // Check if this drill-training combination already exists
+        var exists = drills.some(function(drill) {
+          return drill.post_id == postId && drill.training_id == trainingId;
+        });
+        
+        if (!exists) {
+          // Remove from unassigned if moving to real training
+          if (trainingId !== 'none') {
+            drills = drills.filter(function(drill) {
+              return !(drill.post_id == postId && drill.training_id === 'none');
+            });
+          }
+          
+          drills.push({
+            post_id: postId,
+            training_id: trainingId,
+            added: new Date().toISOString()
+          });
+          
+          localStorage.setItem('ccc-training-drills', JSON.stringify(drills));
         }
-      });
+        
+        self.closeModal();
+        
+        // Update button
+        var button = $('.ccc-favorite-post-toggle-button[data-post_id-ccc_favorite="' + postId + '"]');
+        button.addClass('save');
+        
+        // Reload gallery if present
+        if ($('#ccc-training-gallery').length) {
+          CCC.trainingGallery.loadGallery();
+        }
+      }
     },
     
     removeFromTraining: function(postId, trainingId) {

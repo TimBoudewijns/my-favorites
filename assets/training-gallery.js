@@ -29,28 +29,65 @@ var CCC = CCC || {};
     loadGallery: function() {
       var self = this;
       
-      $.ajax({
-        url: CCC_MY_TRAINING.api,
-        type: 'POST',
-        data: {
-          action: CCC_MY_TRAINING.get_action,
-          nonce: CCC_MY_TRAINING.get_nonce
-        },
-        success: function(response) {
-          console.log('Training gallery response:', response);
-          if (response.success) {
-            self.allSessions = response.data.sessions || [];
-            self.allUnassigned = response.data.unassigned || [];
-            console.log('Loaded sessions:', self.allSessions.length, 'unassigned:', self.allUnassigned.length);
-            self.displayGallery();
-          } else {
-            console.error('Failed to load training sessions');
+      if (CCC_MY_TRAINING && CCC_MY_TRAINING.api && CCC_MY_FAVORITE_UPDATE.user_logged_in) {
+        $.ajax({
+          url: CCC_MY_TRAINING.api,
+          type: 'POST',
+          data: {
+            action: CCC_MY_TRAINING.get_action,
+            nonce: CCC_MY_TRAINING.get_nonce
+          },
+          success: function(response) {
+            console.log('Training gallery response:', response);
+            if (response.success) {
+              self.allSessions = response.data.sessions || [];
+              self.allUnassigned = response.data.unassigned || [];
+              console.log('Loaded sessions:', self.allSessions.length, 'unassigned:', self.allUnassigned.length);
+              self.displayGallery();
+            } else {
+              console.error('Failed to load training sessions');
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('AJAX error loading training sessions:', error);
           }
-        },
-        error: function(xhr, status, error) {
-          console.error('AJAX error loading training sessions:', error);
-        }
-      });
+        });
+      } else {
+        // For non-logged-in users, load from localStorage
+        var sessions = JSON.parse(localStorage.getItem('ccc-training-sessions') || '[]');
+        var drills = JSON.parse(localStorage.getItem('ccc-training-drills') || '[]');
+        var favorites = localStorage.getItem('ccc-my_favorite_post') || '';
+        var unassigned = favorites.split(',').filter(function(id) { return id; });
+        
+        // Calculate drill count for each session and get drill IDs
+        sessions.forEach(function(session) {
+          session.drills = [];
+          session.drill_count = 0;
+          drills.forEach(function(drill) {
+            if (drill.training_id === session.id) {
+              session.drills.push(drill.post_id);
+              session.drill_count++;
+            }
+          });
+        });
+        
+        // Filter unassigned (not in any training)
+        var assignedDrills = [];
+        drills.forEach(function(drill) {
+          if (drill.training_id !== 'none') {
+            assignedDrills.push(drill.post_id.toString());
+          }
+        });
+        
+        unassigned = unassigned.filter(function(id) {
+          return assignedDrills.indexOf(id) === -1;
+        });
+        
+        self.allSessions = sessions;
+        self.allUnassigned = unassigned;
+        console.log('Loaded from localStorage - sessions:', self.allSessions.length, 'unassigned:', self.allUnassigned.length);
+        self.displayGallery();
+      }
     },
     
     displayGallery: function() {
